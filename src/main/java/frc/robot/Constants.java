@@ -12,4 +12,30 @@ package frc.robot;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {}
+public final class Constants {
+
+    public static final int frontLeftDrvMotorPort = 4;
+    public static final int frontRightDrvMotorPort = 2;
+    public static final int rearLeftDrvMotorPort = 6;
+    public static final int rearRightDrvEncoderPort = 8;
+
+    public static final int frontLeftRotMotorPort = 3;
+    public static final int frontRightRotMotorPort = 1;
+    public static final int rearLeftRotMotorPort = 5;
+    public static final int rearRightMotorPort = 7;
+
+    //Encoder ports not accurate yet (written 4/28)
+    public static final int frontLeftEncoderPort = 9;
+    public static final int frontRightEncoderPort = 10;
+    public static final int rearLeftEncoderPort = 11;
+    public static final int rearRightEncoderPort = 12;
+
+    // In degrees
+    public static final double frontLeftEncoderOffset = Math.toRadians(214.225);
+    public static final double frontRightEncoderOffset = Math.toRadians(118.0);
+    public static final double rearLeftEncoderOffset = Math.toRadians(251.15);
+    public static final double rearRightEncoderOffset = Math.toRadians(261.0);
+
+    public static final int xboxControllerPort = 0;
+
+}
