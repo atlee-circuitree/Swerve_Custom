@@ -5,18 +5,35 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import edu.wpi.first.wpilibj.Talon;
+
 
 public class ExampleSubsystem extends SubsystemBase {
+
+  Talon frontLeftDrvMotor;
+  Talon frontRightDrvMotor;
+  Talon rearLeftDrvMotor;
+  Talon rearRightDrvMotor;
+
+
   /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {}
+  public ExampleSubsystem() {
+    frontLeftDrvMotor = new Talon(Constants.frontLeftDrvMotorPort);
+    frontRightDrvMotor = new Talon(Constants.frontRightDrvMotorPort);
+    rearLeftDrvMotor = new Talon(Constants.rearLeftDrvMotorPort);
+    rearRightDrvMotor = new Talon(Constants.rearRightDrvEncoderPort);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+
   }
 }
