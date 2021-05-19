@@ -7,6 +7,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Talon;
+import com.revrobotics.CANEncoder;
+
+
 
 
 public class ExampleSubsystem extends SubsystemBase {
@@ -16,13 +19,15 @@ public class ExampleSubsystem extends SubsystemBase {
   Talon rearLeftDrvMotor;
   Talon rearRightDrvMotor;
 
+  CANEncoder frontLeftDrvEncoder;
+
 
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem() {
     frontLeftDrvMotor = new Talon(Constants.frontLeftDrvMotorPort);
     frontRightDrvMotor = new Talon(Constants.frontRightDrvMotorPort);
     rearLeftDrvMotor = new Talon(Constants.rearLeftDrvMotorPort);
-    rearRightDrvMotor = new Talon(Constants.rearRightDrvEncoderPort);
+    rearRightDrvMotor = new Talon(Constants.rearRightDrvMotorPort);
   }
 
   @Override

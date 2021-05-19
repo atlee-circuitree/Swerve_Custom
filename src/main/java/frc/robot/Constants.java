@@ -17,7 +17,7 @@ public final class Constants {
     public static final int frontLeftDrvMotorPort = 4;
     public static final int frontRightDrvMotorPort = 2;
     public static final int rearLeftDrvMotorPort = 6;
-    public static final int rearRightDrvEncoderPort = 8;
+    public static final int rearRightDrvMotorPort = 8;
 
     public static final int frontLeftRotMotorPort = 3;
     public static final int frontRightRotMotorPort = 1;
