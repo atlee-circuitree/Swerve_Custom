@@ -22,13 +22,13 @@ public final class Constants {
     public static final int frontLeftRotMotorPort = 3;
     public static final int frontRightRotMotorPort = 1;
     public static final int rearLeftRotMotorPort = 5;
-    public static final int rearRightMotorPort = 7;
+    public static final int rearRightRotMotorPort = 7;
 
     //Encoder ports not accurate yet (written 4/28)
-    public static final int frontLeftEncoderPort = 9;
-    public static final int frontRightEncoderPort = 10;
-    public static final int rearLeftEncoderPort = 11;
-    public static final int rearRightEncoderPort = 12;
+    public static final int frontLeftRotEncoderPort = 9;
+    public static final int frontRightRotEncoderPort = 10;
+    public static final int rearLeftRotEncoderPort = 11;
+    public static final int rearRightRotEncoderPort = 12;
 
     // In degrees
     public static final double frontLeftEncoderOffset = Math.toRadians(214.225);
