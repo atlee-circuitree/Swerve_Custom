@@ -8,21 +8,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Talon;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 
 
 public class Drivetrain extends SubsystemBase {
 
-  Talon frontLeftDrvMotor;
-  Talon frontRightDrvMotor;
-  Talon rearLeftDrvMotor;
-  Talon rearRightDrvMotor;
+  TalonFX frontLeftDrvMotor;
+  TalonFX frontRightDrvMotor;
+  TalonFX rearLeftDrvMotor;
+  TalonFX rearRightDrvMotor;
 
-  Talon frontLeftRotMotor;
-  Talon frontRightRotMotor;
-  Talon rearLeftRotMotor;
-  Talon rearRightRotMotor;
+  TalonFX frontLeftRotMotor;
+  TalonFX frontRightRotMotor;
+  TalonFX rearLeftRotMotor;
+  TalonFX rearRightRotMotor;
 
   CANCoder frontLeftRotEncoder;
   CANCoder frontRightRotEncoder;
@@ -31,15 +34,15 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
-    frontLeftDrvMotor = new Talon(Constants.frontLeftDrvMotorPort);
-    frontRightDrvMotor = new Talon(Constants.frontRightDrvMotorPort);
-    rearLeftDrvMotor = new Talon(Constants.rearLeftDrvMotorPort);
-    rearRightDrvMotor = new Talon(Constants.rearRightDrvMotorPort);
+    frontLeftDrvMotor = new TalonFX(Constants.frontLeftDrvMotorPort);
+    frontRightDrvMotor = new TalonFX(Constants.frontRightDrvMotorPort);
+    rearLeftDrvMotor = new TalonFX(Constants.rearLeftDrvMotorPort);
+    rearRightDrvMotor = new TalonFX(Constants.rearRightDrvMotorPort);
 
-    frontLeftRotMotor = new Talon(Constants.frontLeftRotMotorPort);
-    frontRightRotMotor = new Talon(Constants.frontRightRotMotorPort);
-    rearLeftRotMotor = new Talon(Constants.rearLeftRotMotorPort);
-    rearRightRotMotor = new Talon(Constants.rearRightRotMotorPort);
+    frontLeftRotMotor = new TalonFX(Constants.frontLeftRotMotorPort);
+    frontRightRotMotor = new TalonFX(Constants.frontRightRotMotorPort);
+    rearLeftRotMotor = new TalonFX(Constants.rearLeftRotMotorPort);
+    rearRightRotMotor = new TalonFX(Constants.rearRightRotMotorPort);
 
     frontLeftRotEncoder = new CANCoder(Constants.frontLeftRotEncoderPort);
     frontRightRotEncoder = new CANCoder(Constants.frontRightRotEncoderPort);
@@ -51,6 +54,11 @@ public class Drivetrain extends SubsystemBase {
     frontRightRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     rearLeftRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     rearRightRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+
+    frontLeftRotEncoder.setPosition(0);
+    frontRightRotEncoder.setPosition(0);
+    rearLeftRotEncoder.setPosition(0);
+    rearRightRotEncoder.setPosition(0);
 
 
   }
@@ -67,61 +75,135 @@ public class Drivetrain extends SubsystemBase {
   }
 
 
-  public void driveWithXbox(double FLDpwr, double FRDpwr, double RLDpwr, double RRDpwr, double FLrot, double FRrot, double RLrot, double RRrot){
+  public void rotateAllModulesNonLinear(double targetDegrees, double speed){
+
+    //FRONT LEFT
+    if(frontLeftRotEncoder.getPosition() == targetDegrees){
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+    else if(frontLeftRotEncoder.getPosition() > targetDegrees){
+      //Need to check motor power vs direction of rotation
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(frontLeftRotEncoder.getPosition() < targetDegrees){
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    }
+
+    //FRONT RIGHT
+    if(frontRightRotEncoder.getPosition() == targetDegrees){
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+    else if(frontRightRotEncoder.getPosition() > targetDegrees){
+      //Need to check motor power vs direction of rotation
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(frontLeftRotEncoder.getPosition() < targetDegrees){
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    }
+
+    //REAR LEFT
+    if(rearLeftRotEncoder.getPosition() == targetDegrees){
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+    else if(rearLeftRotEncoder.getPosition() > targetDegrees){
+      //Need to check motor power vs direction of rotation
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    } 
+    else if(rearLeftRotEncoder.getPosition() < targetDegrees){
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    }
+
+    //REAR RIGHT
+    if(rearRightRotEncoder.getPosition() == targetDegrees){
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+    else if(rearRightRotEncoder.getPosition() > targetDegrees){
+      //Need to check motor power vs direction of rotation
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput,speed);
+    }
+    else if(rearRightRotEncoder.getPosition() < targetDegrees){
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    }
+
+  } 
+
+
+  //The only difference between rotateAllModulesNonLinear() and rotateAllModulesLinear() is that the non linear is meant to be
+  //called in a bigger loop, and the linear one makes its own loop
+
+  public void rotateAllModulesLinear(double targetDegrees, double speed){
+
+    while(frontLeftRotEncoder.getPosition() != targetDegrees && frontRightRotEncoder.getPosition() != targetDegrees && rearLeftRotEncoder.getPosition() != targetDegrees && rearRightRotEncoder.getPosition() != targetDegrees){
+
+      if(frontLeftRotEncoder.getPosition() == targetDegrees){
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput,  0);
+      }
+      else if(frontLeftRotEncoder.getPosition() > targetDegrees){
+        //Need to check motor power vs direction of rotation
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      }
+      else if(frontLeftRotEncoder.getPosition() < targetDegrees){
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+      }
+
+      //FRONT RIGHT
+      if(frontRightRotEncoder.getPosition() == targetDegrees){
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else if(frontRightRotEncoder.getPosition() > targetDegrees){
+        //Need to check motor power vs direction of rotation
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      }
+      else if(frontLeftRotEncoder.getPosition() < targetDegrees){
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+      }
+
+      //REAR LEFT
+      if(rearLeftRotEncoder.getPosition() == targetDegrees){
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else if(rearLeftRotEncoder.getPosition() > targetDegrees){
+        //Need to check motor power vs direction of rotation
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      }
+      else if(rearLeftRotEncoder.getPosition() < targetDegrees){
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+      }
+
+      //REAR RIGHT
+      if(rearRightRotEncoder.getPosition() == targetDegrees){
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else if(rearRightRotEncoder.getPosition() > targetDegrees){
+        //Need to check motor power vs direction of rotation
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      }
+      else if(rearRightRotEncoder.getPosition() < targetDegrees){
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+      }
+
+    }
+
+  }
+
+
+  public void driveAllModulesNonLinear(double speed){
     
+    frontLeftDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
+    frontRightDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
+    rearLeftDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
+    rearRightDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
+  
   }
 
-  public void rotateAllModulesNonLinear(double targetDegrees){
-
-        //FRONT LEFT
-        if(frontLeftRotEncoder.getPosition() == targetDegrees){
-          frontLeftRotMotor.set(0);
-        }
-        else if(frontLeftRotEncoder.getPosition() > targetDegrees){
-          //Need to check motor power vs direction of rotation
-          frontLeftRotMotor.set(0.75);
-        }
-        else if(frontLeftRotEncoder.getPosition() < targetDegrees){
-          frontLeftRotMotor.set(-0.75);
-        }
-
-        //FRONT RIGHT
-        if(frontRightRotEncoder.getPosition() == targetDegrees){
-          frontRightRotMotor.set(0);
-        }
-        else if(frontRightRotEncoder.getPosition() > targetDegrees){
-          //Need to check motor power vs direction of rotation
-          frontRightRotMotor.set(0.75);
-        }
-        else if(frontLeftRotEncoder.getPosition() < targetDegrees){
-          frontRightRotMotor.set(-0.75);
-        }
-
-        //REAR LEFT
-        if(rearLeftRotEncoder.getPosition() == targetDegrees){
-          rearLeftRotMotor.set(0);
-        }
-        else if(rearLeftRotEncoder.getPosition() > targetDegrees){
-          //Need to check motor power vs direction of rotation
-          rearLeftRotMotor.set(0.75);
-        }
-        else if(rearLeftRotEncoder.getPosition() < targetDegrees){
-          rearLeftRotMotor.set(-0.75);
-        }
-
-        //REAR RIGHT
-        if(rearRightRotEncoder.getPosition() == targetDegrees){
-          frontLeftRotMotor.set(0);
-        }
-        else if(rearRightRotEncoder.getPosition() > targetDegrees){
-          //Need to check motor power vs direction of rotation
-          rearRightRotMotor.set(0.75);
-        }
-        else if(rearRightRotEncoder.getPosition() < targetDegrees){
-          rearRightRotMotor.set(-0.75);
-        }
-
+  public void debugRunMotor(){
+    frontLeftDrvMotor.set(TalonFXControlMode.PercentOutput, 0.5);
   }
+
+  public double getEncoderValue(){
+    return frontLeftRotEncoder.getAbsolutePosition();
+  }
+
 
 }
 
