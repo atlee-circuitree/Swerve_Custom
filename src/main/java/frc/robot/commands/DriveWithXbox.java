@@ -5,9 +5,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Drivetrain.SwerveModule;
+
 import java.lang.Math;
 
 public class DriveWithXbox extends CommandBase {
@@ -47,13 +50,21 @@ public class DriveWithXbox extends CommandBase {
     //ASSUMING Math.acos() is like the cos-1 function on calculators, will have to run tests
     joystickDegrees = Math.acos(RobotContainer.xbox.getX(Hand.kLeft));
 
-    //Since cos-1 only returns positive degrees, this flips it if we actually want a negative value
-    if(RobotContainer.xbox.getY(Hand.kLeft) < 0){
+    //Since cos-1 only returns positive values, this flips it if we actually want a negative value (joystick pointing down)
+    if(RobotContainer.xbox.getY(Hand.kLeft) > 0){
       joystickDegrees = joystickDegrees*-1;
     }
 
-    
-    drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0.25);
+    //joystickDegrees is actually in radians right now, so we convert it to degrees
+    joystickDegrees = joystickDegrees*(180/Math.PI);
+
+    //Put step 2 here:
+
+    //Pass joystickDegrees directly to finalRotateDegrees for now
+    finalRotateDegrees = joystickDegrees;
+
+    //Speed modified for testing, change when needed
+    drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0.1);
 
     if(RobotContainer.xbox.getX(Hand.kLeft) > RobotContainer.xbox.getY(Hand.kLeft)){
       speed = RobotContainer.xbox.getX(Hand.kLeft);
@@ -66,11 +77,27 @@ public class DriveWithXbox extends CommandBase {
     }
 
     //Speed modifier for future testing, remove or change later 
-    speed = speed * 0.5;
+    speed = speed * 0;
 
     drivetrain.driveAllModulesNonLinear(speed);
 
-  }
+    SmartDashboard.putNumber("finalRotateDegrees", finalRotateDegrees);
+    SmartDashboard.putNumber("joystickDegrees", joystickDegrees);
+    SmartDashboard.putNumber("Xbox left X value", RobotContainer.xbox.getX(Hand.kLeft));
+    
+    SmartDashboard.putNumber("frontLeft encoder value", drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
+    SmartDashboard.putNumber("frontLeft PID value", drivetrain.getRotPIDOutput(SwerveModule.FRONT_LEFT));
+    
+    SmartDashboard.putNumber("frontRight encoder value", drivetrain.getRotEncoderValue(SwerveModule.FRONT_RIGHT));
+    SmartDashboard.putNumber("frontRight PID value", drivetrain.getRotPIDOutput(SwerveModule.FRONT_RIGHT));
+    
+    SmartDashboard.putNumber("rearLeft encoder value", drivetrain.getRotEncoderValue(SwerveModule.REAR_LEFT));
+    SmartDashboard.putNumber("rearLeft PID value", drivetrain.getRotPIDOutput(SwerveModule.REAR_LEFT));
+
+    SmartDashboard.putNumber("rearRight encoder value", drivetrain.getRotEncoderValue(SwerveModule.REAR_RIGHT));
+    SmartDashboard.putNumber("rearRight PID value", drivetrain.getRotPIDOutput(SwerveModule.REAR_RIGHT));
+
+  }  
 
   @Override
   public void end(boolean interrupted) {}

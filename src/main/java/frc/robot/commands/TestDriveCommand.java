@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Drivetrain.SwerveModule;
 
 public class TestDriveCommand extends CommandBase {
 
@@ -35,7 +36,7 @@ public class TestDriveCommand extends CommandBase {
     drivetrain.driveAllModulesNonLinear(speed);
     drivetrain.rotateAllModulesNonLinear(90, rotspeed);
 
-    System.out.println(drivetrain.getEncoderValue());
+    System.out.println(drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
   }
 
   @Override

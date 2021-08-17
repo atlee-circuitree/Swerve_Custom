@@ -5,8 +5,10 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.controller.PIDController;
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -31,6 +33,12 @@ public class Drivetrain extends SubsystemBase {
   CANCoder frontRightRotEncoder;
   CANCoder rearLeftRotEncoder;
   CANCoder rearRightRotEncoder;
+
+  PIDController frontLeftPID;
+  PIDController frontRightPID;
+  PIDController rearLeftPID;
+  PIDController rearRightPID;
+
 
   /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
@@ -60,6 +68,23 @@ public class Drivetrain extends SubsystemBase {
     rearLeftRotEncoder.setPosition(0);
     rearRightRotEncoder.setPosition(0);
 
+    //not sure if these are the right values, just grabbed them from Circuitseed_2021
+    frontLeftPID = new PIDController(0.02, 0.00, 0.00);
+    frontRightPID = new PIDController(0.02, 0.00, 0.00);
+    rearLeftPID = new PIDController(0.02, 0.00, 0.00);
+    rearRightPID = new PIDController(0.02, 0.00, 0.00);
+
+    frontLeftPID.enableContinuousInput(-180, 180);
+    frontRightPID.enableContinuousInput(-180, 180);
+    rearLeftPID.enableContinuousInput(-180, 180);
+    rearRightPID.enableContinuousInput(-180, 180);
+
+    frontLeftPID.setTolerance(2.0);
+    frontRightPID.setTolerance(2.0);
+    rearLeftPID.setTolerance(2.0);
+    rearRightPID.setTolerance(2.0);
+    
+
 
   }
 
@@ -77,52 +102,41 @@ public class Drivetrain extends SubsystemBase {
 
   public void rotateAllModulesNonLinear(double targetDegrees, double speed){
 
+    frontLeftPID.setSetpoint(targetDegrees);
+    frontRightPID.setSetpoint(targetDegrees);
+    rearLeftPID.setSetpoint(targetDegrees);
+    rearRightPID.setSetpoint(targetDegrees);
+
     //FRONT LEFT
-    if(frontLeftRotEncoder.getPosition() == targetDegrees){
+    if(frontLeftPID.atSetpoint()){
       frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
-    else if(frontLeftRotEncoder.getPosition() > targetDegrees){
-      //Need to check motor power vs direction of rotation
-      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
-    }
-    else if(frontLeftRotEncoder.getPosition() < targetDegrees){
-      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    else{
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
     }
 
     //FRONT RIGHT
-    if(frontRightRotEncoder.getPosition() == targetDegrees){
+    if(frontRightPID.atSetpoint()){
       frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
-    else if(frontRightRotEncoder.getPosition() > targetDegrees){
-      //Need to check motor power vs direction of rotation
-      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
-    }
-    else if(frontLeftRotEncoder.getPosition() < targetDegrees){
-      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    else{
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition()), speed, 0.1));
     }
 
     //REAR LEFT
-    if(rearLeftRotEncoder.getPosition() == targetDegrees){
+    if(rearLeftPID.atSetpoint()){
       rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
-    else if(rearLeftRotEncoder.getPosition() > targetDegrees){
-      //Need to check motor power vs direction of rotation
-      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
-    } 
-    else if(rearLeftRotEncoder.getPosition() < targetDegrees){
-      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    else{
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
     }
 
     //REAR RIGHT
-    if(rearRightRotEncoder.getPosition() == targetDegrees){
-      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    if(rearRightPID.atSetpoint()){
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
-    else if(rearRightRotEncoder.getPosition() > targetDegrees){
-      //Need to check motor power vs direction of rotation
-      rearRightRotMotor.set(TalonFXControlMode.PercentOutput,speed);
-    }
-    else if(rearRightRotEncoder.getPosition() < targetDegrees){
-      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
+    else{
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition()), speed, 0.1));
     }
 
   } 
@@ -133,56 +147,6 @@ public class Drivetrain extends SubsystemBase {
 
   public void rotateAllModulesLinear(double targetDegrees, double speed){
 
-    while(frontLeftRotEncoder.getPosition() != targetDegrees && frontRightRotEncoder.getPosition() != targetDegrees && rearLeftRotEncoder.getPosition() != targetDegrees && rearRightRotEncoder.getPosition() != targetDegrees){
-
-      if(frontLeftRotEncoder.getPosition() == targetDegrees){
-        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput,  0);
-      }
-      else if(frontLeftRotEncoder.getPosition() > targetDegrees){
-        //Need to check motor power vs direction of rotation
-        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
-      }
-      else if(frontLeftRotEncoder.getPosition() < targetDegrees){
-        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
-      }
-
-      //FRONT RIGHT
-      if(frontRightRotEncoder.getPosition() == targetDegrees){
-        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
-      }
-      else if(frontRightRotEncoder.getPosition() > targetDegrees){
-        //Need to check motor power vs direction of rotation
-        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
-      }
-      else if(frontLeftRotEncoder.getPosition() < targetDegrees){
-        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
-      }
-
-      //REAR LEFT
-      if(rearLeftRotEncoder.getPosition() == targetDegrees){
-        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
-      }
-      else if(rearLeftRotEncoder.getPosition() > targetDegrees){
-        //Need to check motor power vs direction of rotation
-        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
-      }
-      else if(rearLeftRotEncoder.getPosition() < targetDegrees){
-        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
-      }
-
-      //REAR RIGHT
-      if(rearRightRotEncoder.getPosition() == targetDegrees){
-        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
-      }
-      else if(rearRightRotEncoder.getPosition() > targetDegrees){
-        //Need to check motor power vs direction of rotation
-        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
-      }
-      else if(rearRightRotEncoder.getPosition() < targetDegrees){
-        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, -speed);
-      }
-
-    }
 
   }
 
@@ -196,13 +160,54 @@ public class Drivetrain extends SubsystemBase {
   
   }
 
-  public void debugRunMotor(){
-    frontLeftDrvMotor.set(TalonFXControlMode.PercentOutput, 0.5);
+  public double mapValues(double value, double highest, double lowest){
+    if(value > 0){
+      return MathUtil.clamp(value, lowest, highest);
+    }
+    else{
+      return MathUtil.clamp(value, -highest, -lowest);
+  }
+}
+
+  public double getRotEncoderValue(SwerveModule module){
+    if(module == SwerveModule.FRONT_LEFT){
+      return frontLeftRotEncoder.getAbsolutePosition();
+    }
+    else if(module == SwerveModule.FRONT_RIGHT){
+      return frontRightRotEncoder.getAbsolutePosition();
+    }
+    else if(module == SwerveModule.REAR_LEFT){
+      return rearLeftRotEncoder.getAbsolutePosition();
+    }
+    else if(module == SwerveModule.REAR_RIGHT){
+      return rearRightRotEncoder.getAbsolutePosition();
+    }
+    else{
+      return 0;
+    }
+  }
+  public double getRotPIDOutput(SwerveModule module){
+    if(module == SwerveModule.FRONT_LEFT){
+      return frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition());
+    }
+    else if(module == SwerveModule.FRONT_RIGHT){
+      return frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition());
+    }
+    else if(module == SwerveModule.REAR_LEFT){
+      return rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition());
+    }
+    else if(module == SwerveModule.REAR_RIGHT){
+      return rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition());
+    }
+    else{
+      return 0;
+    }
   }
 
-  public double getEncoderValue(){
-    return frontLeftRotEncoder.getAbsolutePosition();
+  public enum SwerveModule{
+    FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT
   }
+
 
 
 }

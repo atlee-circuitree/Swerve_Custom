@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Drivetrain.SwerveModule;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -29,32 +30,32 @@ public class TestRotateModules extends CommandBase {
     drivetrain.rotateAllModulesLinear(90, 0.25);
     
     System.out.println("Encoder Value 1: ");
-    System.out.println(drivetrain.getEncoderValue());
+    System.out.println(drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
 
     drivetrain.rotateAllModulesLinear(0, 0.25);
 
     System.out.println("Encoder Value 2: ");
-    System.out.println(drivetrain.getEncoderValue());
+    System.out.println(drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
     
     drivetrain.rotateAllModulesLinear(180, 0.25);
 
     System.out.println("Encoder Value 3: ");
-    System.out.println(drivetrain.getEncoderValue());
+    System.out.println(drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
 
     drivetrain.rotateAllModulesLinear(0, 0.25);
 
     System.out.println("Encoder Value 4: ");
-    System.out.println(drivetrain.getEncoderValue());
+    System.out.println(drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
 
     drivetrain.rotateAllModulesLinear(-90, 0.25);
 
     System.out.println("Encoder Value 5: ");
-    System.out.println(drivetrain.getEncoderValue());
+    System.out.println(drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
 
     drivetrain.rotateAllModulesLinear(0, 0.25);
 
     System.out.println("Encoder Value 6: ");
-    System.out.println(drivetrain.getEncoderValue());
+    System.out.println(drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
 
   }
 

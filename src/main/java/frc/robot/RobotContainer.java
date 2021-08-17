@@ -36,12 +36,12 @@ public class RobotContainer {
     drivetrain = new Drivetrain();
 
     driveWithXbox = new DriveWithXbox(drivetrain);
-    //driveWithXbox.addRequirements(drivetrain);
-    //drivetrain.setDefaultCommand(driveWithXbox);
+    driveWithXbox.addRequirements(drivetrain);
+    drivetrain.setDefaultCommand(driveWithXbox);
 
     testDriveCommand = new TestDriveCommand(drivetrain);
-    testDriveCommand.addRequirements(drivetrain);
-    drivetrain.setDefaultCommand(testDriveCommand);
+    //testDriveCommand.addRequirements(drivetrain);
+    //drivetrain.setDefaultCommand(testDriveCommand);
 
     //Auto Setup
     testRotateModules = new TestRotateModules(drivetrain);
@@ -69,6 +69,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return testRotateModules;
+    return driveWithXbox;
   }
 }
