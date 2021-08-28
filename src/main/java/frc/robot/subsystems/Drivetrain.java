@@ -7,8 +7,11 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
-import edu.wpi.first.wpilibj.Talon;
+import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -69,20 +72,20 @@ public class Drivetrain extends SubsystemBase {
     rearRightRotEncoder.setPosition(0);
 
     //not sure if these are the right values, just grabbed them from Circuitseed_2021
-    frontLeftPID = new PIDController(0.02, 0.00, 0.00);
-    frontRightPID = new PIDController(0.02, 0.00, 0.00);
-    rearLeftPID = new PIDController(0.02, 0.00, 0.00);
-    rearRightPID = new PIDController(0.02, 0.00, 0.00);
+    frontLeftPID = new PIDController(1.0, 0.00, 0.00);
+    frontRightPID = new PIDController(1.0, 0.00, 0.00);
+    rearLeftPID = new PIDController(1.0, 0.00, 0.00);
+    rearRightPID = new PIDController(1.0, 0.00, 0.00);
 
     frontLeftPID.enableContinuousInput(-180, 180);
     frontRightPID.enableContinuousInput(-180, 180);
     rearLeftPID.enableContinuousInput(-180, 180);
     rearRightPID.enableContinuousInput(-180, 180);
 
-    frontLeftPID.setTolerance(2.0);
-    frontRightPID.setTolerance(2.0);
-    rearLeftPID.setTolerance(2.0);
-    rearRightPID.setTolerance(2.0);
+    frontLeftPID.setTolerance(10.0);
+    frontRightPID.setTolerance(10.0);
+    rearLeftPID.setTolerance(10.0);
+    rearRightPID.setTolerance(10.0);
     
 
 
@@ -112,7 +115,7 @@ public class Drivetrain extends SubsystemBase {
       frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition()), speed, 0));
     }
 
     //FRONT RIGHT
@@ -120,7 +123,7 @@ public class Drivetrain extends SubsystemBase {
       frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition()), speed, 0.1));
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition()), speed, 0));
     }
 
     //REAR LEFT
@@ -128,7 +131,7 @@ public class Drivetrain extends SubsystemBase {
       rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition()), speed, 0));
     }
 
     //REAR RIGHT
@@ -136,7 +139,7 @@ public class Drivetrain extends SubsystemBase {
       rearRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition()), speed, 0.1));
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition()), speed, 0));
     }
 
   } 
@@ -147,6 +150,45 @@ public class Drivetrain extends SubsystemBase {
 
   public void rotateAllModulesLinear(double targetDegrees, double speed){
 
+    frontLeftPID.setSetpoint(targetDegrees);
+    frontRightPID.setSetpoint(targetDegrees);
+    rearLeftPID.setSetpoint(targetDegrees);
+    rearRightPID.setSetpoint(targetDegrees);
+
+    while(!frontLeftPID.atSetpoint() || !frontRightPID.atSetpoint() || !rearLeftPID.atSetpoint() || !rearRightPID.atSetpoint()){
+
+      //FRONT LEFT
+      if(frontLeftPID.atSetpoint()){
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
+      }
+
+      //FRONT RIGHT
+      if(frontRightPID.atSetpoint()){
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition()), speed, 0.1));
+      }
+
+      //REAR LEFT
+      if(rearLeftPID.atSetpoint()){
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
+      }
+
+      //REAR RIGHT
+      if(rearRightPID.atSetpoint()){
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition()), speed, 0.1));
+      }
+    }
 
   }
 
@@ -161,7 +203,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double mapValues(double value, double highest, double lowest){
-    if(value > 0){
+    if(value >= 0){
       return MathUtil.clamp(value, lowest, highest);
     }
     else{
@@ -208,6 +250,34 @@ public class Drivetrain extends SubsystemBase {
     FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT
   }
 
+  public void sendShuffleboard(){
+
+    SmartDashboard.putNumber("Xbox left X value", RobotContainer.xbox.getX(Hand.kLeft));
+    SmartDashboard.putNumber("Xbox left Y value", RobotContainer.xbox.getY(Hand.kLeft));
+    
+    SmartDashboard.putNumber("frontLeft encoder value", getRotEncoderValue(SwerveModule.FRONT_LEFT));
+    SmartDashboard.putNumber("frontLeft PID value", getRotPIDOutput(SwerveModule.FRONT_LEFT));
+    
+    SmartDashboard.putNumber("frontRight encoder value", getRotEncoderValue(SwerveModule.FRONT_RIGHT));
+    SmartDashboard.putNumber("frontRight PID value", getRotPIDOutput(SwerveModule.FRONT_RIGHT));
+    
+    SmartDashboard.putNumber("rearLeft encoder value", getRotEncoderValue(SwerveModule.REAR_LEFT));
+    SmartDashboard.putNumber("rearLeft PID value", getRotPIDOutput(SwerveModule.REAR_LEFT));
+
+    SmartDashboard.putNumber("rearRight encoder value", getRotEncoderValue(SwerveModule.REAR_RIGHT));
+    SmartDashboard.putNumber("rearRight PID value", getRotPIDOutput(SwerveModule.REAR_RIGHT));
+
+  }
+
+  public void recieveLocalShuffleboard(String string, int totalVars){
+
+    String[] splitStringArray = string.split(";");
+
+    for(int i = 0; i >= totalVars-1 ; i++){
+      
+      SmartDashboard.putString(splitStringArray[i], splitStringArray[i+1]);
+    }
+  }
 
 
 }

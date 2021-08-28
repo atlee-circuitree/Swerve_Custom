@@ -19,6 +19,8 @@ public class DriveWithXbox extends CommandBase {
   private double joystickDegrees = 0;
   private double finalRotateDegrees = 0;
   private double speed;
+
+  public static String driveWithXboxShuffleboard;
   
   public DriveWithXbox(Drivetrain dt) {
     
@@ -81,22 +83,11 @@ public class DriveWithXbox extends CommandBase {
 
     drivetrain.driveAllModulesNonLinear(speed);
 
-    SmartDashboard.putNumber("finalRotateDegrees", finalRotateDegrees);
-    SmartDashboard.putNumber("joystickDegrees", joystickDegrees);
-    SmartDashboard.putNumber("Xbox left X value", RobotContainer.xbox.getX(Hand.kLeft));
-    
-    SmartDashboard.putNumber("frontLeft encoder value", drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
-    SmartDashboard.putNumber("frontLeft PID value", drivetrain.getRotPIDOutput(SwerveModule.FRONT_LEFT));
-    
-    SmartDashboard.putNumber("frontRight encoder value", drivetrain.getRotEncoderValue(SwerveModule.FRONT_RIGHT));
-    SmartDashboard.putNumber("frontRight PID value", drivetrain.getRotPIDOutput(SwerveModule.FRONT_RIGHT));
-    
-    SmartDashboard.putNumber("rearLeft encoder value", drivetrain.getRotEncoderValue(SwerveModule.REAR_LEFT));
-    SmartDashboard.putNumber("rearLeft PID value", drivetrain.getRotPIDOutput(SwerveModule.REAR_LEFT));
+    //Show important values on shuffleboard
 
-    SmartDashboard.putNumber("rearRight encoder value", drivetrain.getRotEncoderValue(SwerveModule.REAR_RIGHT));
-    SmartDashboard.putNumber("rearRight PID value", drivetrain.getRotPIDOutput(SwerveModule.REAR_RIGHT));
+    driveWithXboxShuffleboard = "joystickDegrees;" + String.valueOf(joystickDegrees) + ";speed;" + String.valueOf(speed);
 
+  
   }  
 
   @Override

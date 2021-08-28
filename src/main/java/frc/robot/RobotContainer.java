@@ -6,10 +6,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveWithXbox;
 import frc.robot.commands.TestDriveCommand;
 import frc.robot.commands.TestRotateModules;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Drivetrain.SwerveModule;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -52,6 +55,8 @@ public class RobotContainer {
     configureButtonBindings();
 
     //Other Setup
+
+    shuffleboardSetup();
   }
 
   /**
@@ -62,6 +67,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {}
 
+
+  private void shuffleboardSetup(){
+
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -69,6 +79,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return driveWithXbox;
+    return testRotateModules;
   }
 }

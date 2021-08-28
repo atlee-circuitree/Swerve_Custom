@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.DriveWithXbox;
+//Added by Simon 8/18
+import frc.robot.subsystems.Drivetrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
+  private Drivetrain drivetrain;
   private RobotContainer m_robotContainer;
 
   /**
@@ -44,6 +47,15 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    
+    //Added by Simon 8/18
+    try{
+    drivetrain.sendShuffleboard();
+    drivetrain.recieveLocalShuffleboard(DriveWithXbox.driveWithXboxShuffleboard, 4);
+    }
+    catch(NullPointerException exception){
+      //Do nothing if drivetrain hasn't been initialized yet
+    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
