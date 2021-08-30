@@ -87,6 +87,12 @@ public class DriveWithXbox extends CommandBase {
 
     driveWithXboxShuffleboard = "joystickDegrees;" + String.valueOf(joystickDegrees) + ";speed;" + String.valueOf(speed);
 
+
+    drivetrain.sendShuffleboard();
+    SmartDashboard.putString("driveWithXboxShuffleboard", driveWithXboxShuffleboard);
+
+    String[] stringArray = driveWithXboxShuffleboard.split(";");
+    SmartDashboard.putStringArray("DWX local string array", stringArray);
   
   }  
 

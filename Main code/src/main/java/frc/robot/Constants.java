@@ -24,10 +24,9 @@ public final class Constants {
     public static final int rearLeftRotMotorPort = 5;
     public static final int rearRightRotMotorPort = 7;
 
-    //Encoder ports not accurate yet (written 4/28)
-    public static final int frontLeftRotEncoderPort = 9;
-    public static final int frontRightRotEncoderPort = 10;
-    public static final int rearLeftRotEncoderPort = 11;
+    public static final int frontLeftRotEncoderPort = 11;
+    public static final int frontRightRotEncoderPort = 9;
+    public static final int rearLeftRotEncoderPort = 10;
     public static final int rearRightRotEncoderPort = 12;
 
     // In degrees
