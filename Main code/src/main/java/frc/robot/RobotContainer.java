@@ -6,14 +6,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveWithXbox;
+import frc.robot.commands.SmartDashboardCommand;
 import frc.robot.commands.TestDriveCommand;
 import frc.robot.commands.TestRotateModules;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Drivetrain.SwerveModule;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PerpetualCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -29,6 +28,8 @@ public class RobotContainer {
   private final DriveWithXbox driveWithXbox;
   private final TestRotateModules testRotateModules;
   private final TestDriveCommand testDriveCommand;
+  private final SmartDashboardCommand smartDashboardCommand;
+  private final PerpetualCommand DWXwithSDC;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -37,10 +38,15 @@ public class RobotContainer {
     
     //Drive Setup
     drivetrain = new Drivetrain();
+    
 
     driveWithXbox = new DriveWithXbox(drivetrain);
     driveWithXbox.addRequirements(drivetrain);
-    drivetrain.setDefaultCommand(driveWithXbox);
+
+    smartDashboardCommand = new SmartDashboardCommand();
+    DWXwithSDC = new PerpetualCommand(driveWithXbox.alongWith(smartDashboardCommand));
+
+    drivetrain.setDefaultCommand(DWXwithSDC);
 
     testDriveCommand = new TestDriveCommand(drivetrain);
     //testDriveCommand.addRequirements(drivetrain);
@@ -56,7 +62,8 @@ public class RobotContainer {
 
     //Other Setup
 
-    shuffleboardSetup();
+    
+
   }
 
   /**
@@ -68,9 +75,11 @@ public class RobotContainer {
   private void configureButtonBindings() {}
 
 
-  private void shuffleboardSetup(){
-
+  //Sends smart dashboard command to robot.java where it can be called indefinetly
+  public Command getSmartDashboardCommand(){
+    return smartDashboardCommand;
   }
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -78,7 +87,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
     return testRotateModules;
   }
 }

@@ -7,10 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -251,7 +248,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void sendShuffleboard(){
-
+    /*
     SmartDashboard.putNumber("Xbox left X value", RobotContainer.xbox.getX(Hand.kLeft));
     SmartDashboard.putNumber("Xbox left Y value", RobotContainer.xbox.getY(Hand.kLeft));
     
@@ -266,16 +263,17 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("rearRight encoder value", getRotEncoderValue(SwerveModule.REAR_RIGHT));
     SmartDashboard.putNumber("rearRight PID value", getRotPIDOutput(SwerveModule.REAR_RIGHT));
-
+    */
   }
 
-  public void recieveLocalShuffleboard(String string, int totalVars){
+  public void splitLocalDashboardString(String string){
 
-    String[] splitStringArray = string.split(";");
+    String[] splitStringArray = string.split("|");
 
-    for(int i = 0; i >= totalVars-1 ; i++){
+    for(int i = 0; i >= splitStringArray.length; i = i + 2){
       
-      SmartDashboard.putString(splitStringArray[i], splitStringArray[i+1]);
+      System.out.println(splitStringArray[i]);
+      System.out.print(splitStringArray[i+1]);
     }
   }
 

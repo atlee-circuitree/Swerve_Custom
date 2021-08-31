@@ -5,11 +5,9 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Drivetrain.SwerveModule;
 
 import java.lang.Math;
 
@@ -20,7 +18,7 @@ public class DriveWithXbox extends CommandBase {
   private double finalRotateDegrees = 0;
   private double speed;
 
-  public static String driveWithXboxShuffleboard;
+  public static String driveWithXboxDashboard;
   
   public DriveWithXbox(Drivetrain dt) {
     
@@ -68,10 +66,10 @@ public class DriveWithXbox extends CommandBase {
     //Speed modified for testing, change when needed
     drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0.1);
 
-    if(RobotContainer.xbox.getX(Hand.kLeft) > RobotContainer.xbox.getY(Hand.kLeft)){
+    if(Math.abs(RobotContainer.xbox.getX(Hand.kLeft)) > Math.abs(RobotContainer.xbox.getY(Hand.kLeft))){
       speed = RobotContainer.xbox.getX(Hand.kLeft);
     }
-    else if(RobotContainer.xbox.getX(Hand.kLeft) < RobotContainer.xbox.getY(Hand.kLeft)){
+    else if(Math.abs(RobotContainer.xbox.getX(Hand.kLeft)) < Math.abs(RobotContainer.xbox.getY(Hand.kLeft))){
       speed = RobotContainer.xbox.getY(Hand.kLeft);
     }
     else{
@@ -79,15 +77,15 @@ public class DriveWithXbox extends CommandBase {
     }
 
     //Speed modifier for future testing, remove or change later 
-    speed = speed * 0;
+    speed = speed * 0.2;
 
     drivetrain.driveAllModulesNonLinear(speed);
 
     //Show important values on shuffleboard
 
-    driveWithXboxShuffleboard = "joystickDegrees;" + String.valueOf(joystickDegrees) + ";speed;" + String.valueOf(speed);
+    driveWithXboxDashboard = "joystickDegrees/" + String.valueOf(joystickDegrees) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "speed/" + String.valueOf(speed);
 
-  
   }  
 
   @Override
