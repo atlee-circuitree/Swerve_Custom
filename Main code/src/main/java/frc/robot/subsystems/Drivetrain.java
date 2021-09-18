@@ -39,8 +39,8 @@ public class Drivetrain extends SubsystemBase {
   PIDController rearLeftPID;
   PIDController rearRightPID;
 
+  public static String drivetrainDashboard;
 
-  /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
     frontLeftDrvMotor = new TalonFX(Constants.frontLeftDrvMotorPort);
     frontRightDrvMotor = new TalonFX(Constants.frontRightDrvMotorPort);
@@ -92,6 +92,18 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
+    drivetrainDashboard = "frontLeft rot encoder/" + getRotEncoderValue(SwerveModule.FRONT_LEFT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "frontLeft PID/" + getRotPIDOutput(SwerveModule.FRONT_LEFT) + ";";
+
+    drivetrainDashboard = drivetrainDashboard + "frontRight rot encoder/" + getRotEncoderValue(SwerveModule.FRONT_RIGHT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "frontRight PID/" + getRotPIDOutput(SwerveModule.FRONT_RIGHT) + ";";
+
+    drivetrainDashboard = drivetrainDashboard + "rearLeft rot encoder/" + getRotEncoderValue(SwerveModule.REAR_LEFT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "rearLeft PID/" + getRotPIDOutput(SwerveModule.REAR_LEFT) + ";";
+
+    drivetrainDashboard = drivetrainDashboard + "rearRight rot encoder/" + getRotEncoderValue(SwerveModule.REAR_RIGHT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "rearRight PID/" + getRotPIDOutput(SwerveModule.REAR_RIGHT); 
+
   }
 
   @Override
@@ -99,6 +111,20 @@ public class Drivetrain extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
 
+  //------------------------------------------------------------------------------------------------------------------------------------
+  //ENUMS
+  //------------------------------------------------------------------------------------------------------------------------------------
+  public enum SwerveModule{
+    FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT
+  }
+
+  public enum Motors{
+    FRONT_LEFT_ROT, FRONT_RIGHT_ROT, REAR_LEFT_ROT, REAR_RIGHT_ROT, FRONT_LEFT_DRV, FRONT_RIGHT_DRV, REAR_LEFT_DRV, REAR_RIGHT_DRV
+  }
+
+  //------------------------------------------------------------------------------------------------------------------------------------
+  //DRIVE/ROTATION
+  //------------------------------------------------------------------------------------------------------------------------------------
 
   public void rotateAllModulesNonLinear(double targetDegrees, double speed){
 
@@ -199,14 +225,38 @@ public class Drivetrain extends SubsystemBase {
   
   }
 
-  public double mapValues(double value, double highest, double lowest){
-    if(value >= 0){
-      return MathUtil.clamp(value, lowest, highest);
+  //Add other motors as needed, just make sure to put them in the enum too
+  public void rotateMotor(Motors motor, double speed){
+    if(motor == Motors.FRONT_LEFT_ROT){
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
     }
-    else{
-      return MathUtil.clamp(value, -highest, -lowest);
+    else if(motor == Motors.FRONT_RIGHT_ROT){
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(motor == Motors.REAR_LEFT_ROT){
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(motor == Motors.REAR_RIGHT_ROT){
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(motor == Motors.FRONT_LEFT_DRV){
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(motor == Motors.FRONT_RIGHT_DRV){
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(motor == Motors.REAR_LEFT_DRV){
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
+    else if(motor == Motors.REAR_RIGHT_DRV){
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+    }
   }
-}
+
+
+  //------------------------------------------------------------------------------------------------------------------------------------
+  //SENSORS
+  //------------------------------------------------------------------------------------------------------------------------------------
 
   public double getRotEncoderValue(SwerveModule module){
     if(module == SwerveModule.FRONT_LEFT){
@@ -242,39 +292,39 @@ public class Drivetrain extends SubsystemBase {
       return 0;
     }
   }
+  
 
-  public enum SwerveModule{
-    FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT
-  }
 
-  public void sendShuffleboard(){
-    /*
-    SmartDashboard.putNumber("Xbox left X value", RobotContainer.xbox.getX(Hand.kLeft));
-    SmartDashboard.putNumber("Xbox left Y value", RobotContainer.xbox.getY(Hand.kLeft));
-    
-    SmartDashboard.putNumber("frontLeft encoder value", getRotEncoderValue(SwerveModule.FRONT_LEFT));
-    SmartDashboard.putNumber("frontLeft PID value", getRotPIDOutput(SwerveModule.FRONT_LEFT));
-    
-    SmartDashboard.putNumber("frontRight encoder value", getRotEncoderValue(SwerveModule.FRONT_RIGHT));
-    SmartDashboard.putNumber("frontRight PID value", getRotPIDOutput(SwerveModule.FRONT_RIGHT));
-    
-    SmartDashboard.putNumber("rearLeft encoder value", getRotEncoderValue(SwerveModule.REAR_LEFT));
-    SmartDashboard.putNumber("rearLeft PID value", getRotPIDOutput(SwerveModule.REAR_LEFT));
+  //------------------------------------------------------------------------------------------------------------------------------------
+  //OTHER FUNCTIONS
+  //------------------------------------------------------------------------------------------------------------------------------------
 
-    SmartDashboard.putNumber("rearRight encoder value", getRotEncoderValue(SwerveModule.REAR_RIGHT));
-    SmartDashboard.putNumber("rearRight PID value", getRotPIDOutput(SwerveModule.REAR_RIGHT));
-    */
-  }
-
-  public void splitLocalDashboardString(String string){
-
-    String[] splitStringArray = string.split("|");
-
-    for(int i = 0; i >= splitStringArray.length; i = i + 2){
-      
-      System.out.println(splitStringArray[i]);
-      System.out.print(splitStringArray[i+1]);
+  public double mapValues(double value, double highest, double lowest){
+    if(value >= 0){
+      return MathUtil.clamp(value, lowest, highest);
     }
+    else{
+      return MathUtil.clamp(value, -highest, -lowest);
+  }
+}
+
+  public String sendDashboard(){
+    
+    String drivetrainDashboard;
+
+    drivetrainDashboard = "frontLeft rot encoder/" + getRotEncoderValue(SwerveModule.FRONT_LEFT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "frontLeft PID/" + getRotPIDOutput(SwerveModule.FRONT_LEFT) + ";";
+
+    drivetrainDashboard = drivetrainDashboard + "frontRight rot encoder/" + getRotEncoderValue(SwerveModule.FRONT_RIGHT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "frontRight PID/" + getRotPIDOutput(SwerveModule.FRONT_RIGHT) + ";";
+
+    drivetrainDashboard = drivetrainDashboard + "rearLeft rot encoder/" + getRotEncoderValue(SwerveModule.REAR_LEFT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "rearLeft PID/" + getRotPIDOutput(SwerveModule.REAR_LEFT) + ";";
+
+    drivetrainDashboard = drivetrainDashboard + "rearRight rot encoder/" + getRotEncoderValue(SwerveModule.REAR_RIGHT) + ";";
+    drivetrainDashboard = drivetrainDashboard + "rearRight PID/" + getRotPIDOutput(SwerveModule.REAR_RIGHT);
+
+    return drivetrainDashboard;
   }
 
 

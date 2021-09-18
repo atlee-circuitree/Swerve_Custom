@@ -6,7 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveWithXbox;
+import frc.robot.commands.RecalibrateModules;
 import frc.robot.commands.SmartDashboardCommand;
 import frc.robot.commands.TestDriveCommand;
 import frc.robot.commands.TestRotateModules;
@@ -22,23 +26,30 @@ import edu.wpi.first.wpilibj2.command.PerpetualCommand;
  */
 public class RobotContainer {
   
-
+  //Controllers
   public static XboxController xbox;
+  
+  //Subsystems
   private final Drivetrain drivetrain;
+  
+  //Commands
   private final DriveWithXbox driveWithXbox;
   private final TestRotateModules testRotateModules;
   private final TestDriveCommand testDriveCommand;
   private final SmartDashboardCommand smartDashboardCommand;
   private final PerpetualCommand DWXwithSDC;
+  private final RecalibrateModules recalibrateModules;
+  
+
+  private boolean runOnce = false;
+  private int teleopSelector = 1;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     
-    //Drive Setup
     drivetrain = new Drivetrain();
-    
 
     driveWithXbox = new DriveWithXbox(drivetrain);
     driveWithXbox.addRequirements(drivetrain);
@@ -46,7 +57,6 @@ public class RobotContainer {
     smartDashboardCommand = new SmartDashboardCommand();
     DWXwithSDC = new PerpetualCommand(driveWithXbox.alongWith(smartDashboardCommand));
 
-    drivetrain.setDefaultCommand(DWXwithSDC);
 
     testDriveCommand = new TestDriveCommand(drivetrain);
     //testDriveCommand.addRequirements(drivetrain);
@@ -62,8 +72,9 @@ public class RobotContainer {
 
     //Other Setup
 
-    
+    recalibrateModules = new RecalibrateModules(drivetrain, xbox);
 
+    drivetrain.setDefaultCommand(DWXwithSDC);
   }
 
   /**
@@ -73,13 +84,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {}
-
-
-  //Sends smart dashboard command to robot.java where it can be called indefinetly
-  public Command getSmartDashboardCommand(){
-    return smartDashboardCommand;
-  }
-  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

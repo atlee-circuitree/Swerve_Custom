@@ -2,12 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+/*
+  A semi-quick explanation on how this file works for the person that has to debug this:
+
+  There are global (public static) strings in each of the files we need variables from, they should be named ________Dashboard
+  They are there to "package" all of the local (private) variables in that certain subsystem/command to "send" to this file
+  I have structured them in a very specific way in order to "unpack" them in this file and push them to SmartDashboard
+  
+  Backslashes separate variable names from their values, and semicolons separate pairs of name/values
+  Like this: name1/value1;name2/value2;name3/value3
+
+  How this code actually breaks the strings apart relies on the String.split() function, which breaks up a string around a certain character
+  
+  Step 1: Get global Dashboard string from subsystem/command and split it around the semicolon
+  (string is now an array that looks like this [[name1/value1],[name2/value2],[name3/value3]])
+  
+  Step 2: For each element in that new array, split it around the backslash
+  (first loop = [name1,value1]    second loop = [name2,value2]    third loop = [name3,value3])
+  
+  Step 3: Push the 1st element in the double split string as the variable name, and the second one as the variable value
+
+*/
+
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Drivetrain;
 
 
 public class SmartDashboardCommand extends CommandBase {
@@ -30,7 +53,7 @@ public class SmartDashboardCommand extends CommandBase {
 
     for(int i = 0; i <= splitStringArrayDWX.length-1; i++){
 
-      String[] splitSplitStringArrayDWX = splitStringArrayDWX[0].split("/");
+      String[] splitSplitStringArrayDWX = splitStringArrayDWX[i].split("/");
       SmartDashboard.putString(splitSplitStringArrayDWX[0], splitSplitStringArrayDWX[1]);
 
     }
@@ -39,21 +62,21 @@ public class SmartDashboardCommand extends CommandBase {
 
     //VARS FROM ROBOTCONTAINER AND DRIVETRAIN
 
+    //Robotcontainer vars
     SmartDashboard.putNumber("Xbox left X value", RobotContainer.xbox.getX(Hand.kLeft));
     SmartDashboard.putNumber("Xbox left Y value", RobotContainer.xbox.getY(Hand.kLeft));
-    /*    
-    SmartDashboard.putNumber("frontLeft encoder value", drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
-    SmartDashboard.putNumber("frontLeft PID value", drivetrain.getRotPIDOutput(SwerveModule.FRONT_LEFT));
     
-    SmartDashboard.putNumber("frontRight encoder value", drivetrain.getRotEncoderValue(SwerveModule.FRONT_RIGHT));
-    SmartDashboard.putNumber("frontRight PID value", drivetrain.getRotPIDOutput(SwerveModule.FRONT_RIGHT));
+    //Drivetrain display local vars
+    String[] splitStringArrayDVT = Drivetrain.drivetrainDashboard.split(";");
+    SmartDashboard.putNumber("DVT String Length", splitStringArrayDVT.length);
     
-    SmartDashboard.putNumber("rearLeft encoder value", drivetrain.getRotEncoderValue(SwerveModule.REAR_LEFT));
-    SmartDashboard.putNumber("rearLeft PID value", drivetrain.getRotPIDOutput(SwerveModule.REAR_LEFT));
+    for(int i = 0; i <= splitStringArrayDVT.length-1; i++){
 
-    SmartDashboard.putNumber("rearRight encoder value", drivetrain.getRotEncoderValue(SwerveModule.REAR_RIGHT));
-    SmartDashboard.putNumber("rearRight PID value", drivetrain.getRotPIDOutput(SwerveModule.REAR_RIGHT));
-    */
+      String[] splitSplitStringArrayDVT = splitStringArrayDVT[i].split("/");
+      SmartDashboard.putString(splitSplitStringArrayDVT[0], splitSplitStringArrayDVT[1]);
+
+    }
+    SmartDashboard.putString("drivetrainDashboard", Drivetrain.drivetrainDashboard);
 
   }  
 

@@ -64,7 +64,12 @@ public class DriveWithXbox extends CommandBase {
     finalRotateDegrees = joystickDegrees;
 
     //Speed modified for testing, change when needed
-    drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0.1);
+    if(RobotContainer.xbox.getX(Hand.kLeft) == 0 && RobotContainer.xbox.getY(Hand.kLeft) == 0){
+      drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0);  
+    }
+    else{
+      drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0.1);
+    }
 
     if(Math.abs(RobotContainer.xbox.getX(Hand.kLeft)) > Math.abs(RobotContainer.xbox.getY(Hand.kLeft))){
       speed = RobotContainer.xbox.getX(Hand.kLeft);
@@ -85,7 +90,6 @@ public class DriveWithXbox extends CommandBase {
 
     driveWithXboxDashboard = "joystickDegrees/" + String.valueOf(joystickDegrees) + ";";
     driveWithXboxDashboard = driveWithXboxDashboard + "speed/" + String.valueOf(speed);
-
   }  
 
   @Override
