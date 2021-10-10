@@ -47,15 +47,24 @@ public class DriveWithXbox extends CommandBase {
     7. Debug the heck out of this command
     */
 
-    //ASSUMING Math.acos() is like the cos-1 function on calculators, will have to run tests
-    joystickDegrees = Math.acos(RobotContainer.xbox.getX(Hand.kLeft));
-
-    //Since cos-1 only returns positive values, this flips it if we actually want a negative value (joystick pointing down)
-    if(RobotContainer.xbox.getY(Hand.kLeft) > 0){
-      joystickDegrees = joystickDegrees*-1;
+    //tan-1 of slope of the line through the orgin and (JoyX, JoyY) gives us degree value
+    try{
+      joystickDegrees = Math.atan(RobotContainer.xbox.getY(Hand.kLeft)/RobotContainer.xbox.getX(Hand.kLeft));
+    }
+    //But if X is 0 (when degrees is pi/2 or -pi/2) we catch the DivideByZeroError and assign joystickDegrees pi/2 or -pi/2 depending on the Y position
+    catch(Exception e){
+      joystickDegrees = (Math.PI/2) * (RobotContainer.xbox.getY(Hand.kLeft) / Math.abs(RobotContainer.xbox.getY(Hand.kLeft))); 
     }
 
-    //joystickDegrees is actually in radians right now, so we convert it to degrees
+    //Since tan-1 only returns values on the right side of the unit circle, this flips it if we want a value out of [pi/2,-pi/2]
+    if(RobotContainer.xbox.getX(Hand.kLeft) < 0 && RobotContainer.xbox.getY(Hand.kLeft) > 0){
+      joystickDegrees = joystickDegrees + Math.PI;
+    }
+    else if((RobotContainer.xbox.getX(Hand.kLeft) < 0 && RobotContainer.xbox.getY(Hand.kLeft) < 0)){
+      joystickDegrees = joystickDegrees - Math.PI;
+    }
+
+    //joystickDegrees is actually in radians right now, so we convert it to degrees (change later if necessary)
     joystickDegrees = joystickDegrees*(180/Math.PI);
 
     //Put step 2 here:
