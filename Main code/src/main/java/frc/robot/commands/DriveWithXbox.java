@@ -6,8 +6,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Drivetrain.Motors;
+import frc.robot.subsystems.Drivetrain.SwerveModule;
 
 import java.lang.Math;
 
@@ -36,6 +39,10 @@ public class DriveWithXbox extends CommandBase {
     /*
     Holy cow this is going to be A LOT of code eventually...
     (Actually, it's pretty compact/efficient currently. I thought this was going to need a lot more code... - Simon 8/3/21)
+    (You were a fool, past Simon. This is going to be a lot of code, and even more math - Simon 10/11/21)
+
+    IF YOU DO WANT TO EDIT THIS COMMAND, BE SURE TO READ THE SWERVE PDFs
+    (can be found on chief delphi, search for "4 wheel independent drive independent steering swerve", should be 1st 2 PDFs)
 
     Steps of what we need to do:
     1. Convert joystick X/Y values to degrees   
@@ -47,58 +54,48 @@ public class DriveWithXbox extends CommandBase {
     7. Debug the heck out of this command
     */
 
-    //tan-1 of slope of the line through the orgin and (JoyX, JoyY) gives us degree value
-    try{
-      joystickDegrees = Math.atan(RobotContainer.xbox.getY(Hand.kLeft)/RobotContainer.xbox.getX(Hand.kLeft));
-    }
-    //But if X is 0 (when degrees is pi/2 or -pi/2) we catch the DivideByZeroError and assign joystickDegrees pi/2 or -pi/2 depending on the Y position
-    catch(Exception e){
-      joystickDegrees = (Math.PI/2) * (RobotContainer.xbox.getY(Hand.kLeft) / Math.abs(RobotContainer.xbox.getY(Hand.kLeft))); 
-    }
-
-    //Since tan-1 only returns values on the right side of the unit circle, this flips it if we want a value out of [pi/2,-pi/2]
-    if(RobotContainer.xbox.getX(Hand.kLeft) < 0 && RobotContainer.xbox.getY(Hand.kLeft) > 0){
-      joystickDegrees = joystickDegrees + Math.PI;
-    }
-    else if((RobotContainer.xbox.getX(Hand.kLeft) < 0 && RobotContainer.xbox.getY(Hand.kLeft) < 0)){
-      joystickDegrees = joystickDegrees - Math.PI;
-    }
-
+    //arctan of slope of the line through the orgin and (JoyX, JoyY) gives us degree value (atan2 does that, plus catches all exeptions)
+    joystickDegrees = Math.atan2(-RobotContainer.xbox.getY(Hand.kLeft),RobotContainer.xbox.getX(Hand.kLeft));
+    
     //joystickDegrees is actually in radians right now, so we convert it to degrees (change later if necessary)
     joystickDegrees = joystickDegrees*(180/Math.PI);
 
-    //Put step 2 here:
+  
+    //Define robot target vector variables (X,Y,Z respectively)  
+    double forward = -RobotContainer.xbox.getY(Hand.kLeft);
+    double strafe = RobotContainer.xbox.getX(Hand.kLeft);
+    double rotation = RobotContainer.xbox.getX(Hand.kRight);
 
-    //Pass joystickDegrees directly to finalRotateDegrees for now
-    finalRotateDegrees = joystickDegrees;
+    //Modify target values for field orientation (temp used to save calculations before original forward and strafe values are modified)
+    double temp = forward * Math.cos(drivetrain.getNavXOutput()) + strafe * Math.sin(drivetrain.getNavXOutput()); 
+    strafe = -forward * Math.sin(drivetrain.getNavXOutput()) + strafe * Math.cos(drivetrain.getNavXOutput()); 
+    forward = temp;
 
-    //Speed modified for testing, change when needed
-    if(RobotContainer.xbox.getX(Hand.kLeft) == 0 && RobotContainer.xbox.getY(Hand.kLeft) == 0){
-      drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0);  
-    }
-    else{
-      drivetrain.rotateAllModulesNonLinear(finalRotateDegrees, 0.1);
-    }
+    //Do some math to actually define the target vectors
+    //I don't have enough space to say what A,B,C and D represent, but the swerve documentation does it well 
+    double A = strafe - (rotation * (Constants.wheelbase/2));
+    double B = strafe + (rotation * (Constants.wheelbase/2));
+    double C = forward - (rotation * (Constants.trackwidth/2));
+    double D = forward + (rotation * (Constants.trackwidth/2));
 
-    if(Math.abs(RobotContainer.xbox.getX(Hand.kLeft)) > Math.abs(RobotContainer.xbox.getY(Hand.kLeft))){
-      speed = RobotContainer.xbox.getX(Hand.kLeft);
-    }
-    else if(Math.abs(RobotContainer.xbox.getX(Hand.kLeft)) < Math.abs(RobotContainer.xbox.getY(Hand.kLeft))){
-      speed = RobotContainer.xbox.getY(Hand.kLeft);
-    }
-    else{
-      speed = 0;
-    }
+    //Set speeds for modules
+    drivetrain.rotateMotor(Motors.FRONT_LEFT_ROT, Math.sqrt(Math.pow(B, 2) + Math.pow(D, 2)));
+    drivetrain.rotateMotor(Motors.FRONT_RIGHT_ROT, Math.sqrt(Math.pow(B, 2) + Math.pow(C, 2)));
+    drivetrain.rotateMotor(Motors.REAR_LEFT_ROT, Math.sqrt(Math.pow(A, 2) + Math.pow(D, 2)));
+    drivetrain.rotateMotor(Motors.REAR_RIGHT_ROT, Math.sqrt(Math.pow(A, 2) + Math.pow(C, 2)));
 
-    //Speed modifier for future testing, remove or change later 
-    speed = speed * 0.2;
-
-    drivetrain.driveAllModulesNonLinear(speed);
+    //Set angles for modules (change speed mod later if needed)
+    drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D), 0.2);
+    drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C), 0.2);
+    drivetrain.rotateModuleNonLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D), 0.2);
+    drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C), 0.2);
 
     //Show important values on shuffleboard
+    driveWithXboxDashboard = "FL Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(B, 2) + Math.pow(D, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(B, D))) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "FR Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(B, 2) + Math.pow(C, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(B, C))) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "RL Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(A, 2) + Math.pow(A, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(A, D))) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "RR Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(A, 2) + Math.pow(C, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(A, C))) + ";";
 
-    driveWithXboxDashboard = "joystickDegrees/" + String.valueOf(joystickDegrees) + ";";
-    driveWithXboxDashboard = driveWithXboxDashboard + "speed/" + String.valueOf(speed);
   }  
 
   @Override

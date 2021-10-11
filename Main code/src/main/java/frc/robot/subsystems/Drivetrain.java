@@ -8,13 +8,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.controller.PIDController;
-
-
+import edu.wpi.first.wpilibj.SPI;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.kauailabs.navx.frc.AHRS;
 
 
 public class Drivetrain extends SubsystemBase {
@@ -39,6 +40,8 @@ public class Drivetrain extends SubsystemBase {
   PIDController rearLeftPID;
   PIDController rearRightPID;
 
+  AHRS navx;
+
   public static String drivetrainDashboard;
 
   public Drivetrain() {
@@ -51,6 +54,11 @@ public class Drivetrain extends SubsystemBase {
     frontRightRotMotor = new TalonFX(Constants.frontRightRotMotorPort);
     rearLeftRotMotor = new TalonFX(Constants.rearLeftRotMotorPort);
     rearRightRotMotor = new TalonFX(Constants.rearRightRotMotorPort);
+
+    frontLeftRotMotor.setNeutralMode(NeutralMode.Brake);
+    frontRightRotMotor.setNeutralMode(NeutralMode.Brake);
+    rearLeftRotMotor.setNeutralMode(NeutralMode.Brake);
+    rearRightRotMotor.setNeutralMode(NeutralMode.Brake);
 
     frontLeftRotEncoder = new CANCoder(Constants.frontLeftRotEncoderPort);
     frontRightRotEncoder = new CANCoder(Constants.frontRightRotEncoderPort);
@@ -79,12 +87,13 @@ public class Drivetrain extends SubsystemBase {
     rearLeftPID.enableContinuousInput(-180, 180);
     rearRightPID.enableContinuousInput(-180, 180);
 
-    frontLeftPID.setTolerance(10.0);
-    frontRightPID.setTolerance(10.0);
-    rearLeftPID.setTolerance(10.0);
-    rearRightPID.setTolerance(10.0);
+    frontLeftPID.setTolerance(2.0);
+    frontRightPID.setTolerance(2.0);
+    rearLeftPID.setTolerance(2.0);
+    rearRightPID.setTolerance(2.0);
     
-
+    navx = new AHRS(SPI.Port.kMXP);
+    navx.reset();
 
   }
 
@@ -138,7 +147,7 @@ public class Drivetrain extends SubsystemBase {
       frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition()), speed, 0));
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_LEFT), -speed, speed));
     }
 
     //FRONT RIGHT
@@ -146,7 +155,7 @@ public class Drivetrain extends SubsystemBase {
       frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition()), speed, 0));
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_RIGHT), -speed, speed));
     }
 
     //REAR LEFT
@@ -154,7 +163,7 @@ public class Drivetrain extends SubsystemBase {
       rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition()), speed, 0));
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_LEFT), -speed, speed));
     }
 
     //REAR RIGHT
@@ -162,7 +171,7 @@ public class Drivetrain extends SubsystemBase {
       rearRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
     }
     else{
-      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition()), speed, 0));
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_RIGHT), -speed, speed));
     }
 
   } 
@@ -185,7 +194,7 @@ public class Drivetrain extends SubsystemBase {
         frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
       }
       else{
-        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_LEFT), -speed, speed));
       }
 
       //FRONT RIGHT
@@ -193,7 +202,7 @@ public class Drivetrain extends SubsystemBase {
         frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
       }
       else{
-        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition()), speed, 0.1));
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_RIGHT), -speed, speed));
       }
 
       //REAR LEFT
@@ -201,7 +210,7 @@ public class Drivetrain extends SubsystemBase {
         rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
       }
       else{
-        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition()), speed, 0.1));
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_LEFT), -speed, speed));
       }
 
       //REAR RIGHT
@@ -209,7 +218,7 @@ public class Drivetrain extends SubsystemBase {
         rearRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
       }
       else{
-        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, mapValues(rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition()), speed, 0.1));
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_RIGHT), -speed, speed));
       }
     }
 
@@ -253,46 +262,105 @@ public class Drivetrain extends SubsystemBase {
     }
   }
 
+  public void rotateModuleNonLinear(SwerveModule module, double targetDegrees, double speed){
+
+    if(module == SwerveModule.FRONT_LEFT){
+      frontLeftPID.setSetpoint(targetDegrees);
+      if(frontLeftPID.atSetpoint()){
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_LEFT), -speed, speed));
+      }
+    }
+    else if(module == SwerveModule.FRONT_RIGHT){
+      frontRightPID.setSetpoint(targetDegrees);
+      if(frontRightPID.atSetpoint()){
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_RIGHT), -speed, speed));
+      }
+    }
+    else if(module == SwerveModule.REAR_LEFT){
+      rearLeftPID.setSetpoint(targetDegrees);
+      if(rearLeftPID.atSetpoint()){
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_LEFT), -speed, speed));
+      }
+    }
+    else if(module == SwerveModule.REAR_RIGHT){
+      rearRightPID.setSetpoint(targetDegrees);
+      if(rearRightPID.atSetpoint()){
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+      }
+      else{
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_RIGHT), -speed, speed));
+      }
+    }
+
+  }
+
 
   //------------------------------------------------------------------------------------------------------------------------------------
   //SENSORS
   //------------------------------------------------------------------------------------------------------------------------------------
 
   public double getRotEncoderValue(SwerveModule module){
+
+    double encoderValue = 0;
+
+    //Assigns offset encoder absolute position based on input SwerveModule parameter
     if(module == SwerveModule.FRONT_LEFT){
-      return frontLeftRotEncoder.getAbsolutePosition();
+      encoderValue = frontLeftRotEncoder.getAbsolutePosition() - Constants.frontLeftEncoderOffset;
     }
     else if(module == SwerveModule.FRONT_RIGHT){
-      return frontRightRotEncoder.getAbsolutePosition();
+      encoderValue = frontRightRotEncoder.getAbsolutePosition() - Constants.frontRightEncoderOffset;
     }
     else if(module == SwerveModule.REAR_LEFT){
-      return rearLeftRotEncoder.getAbsolutePosition();
+      encoderValue = rearLeftRotEncoder.getAbsolutePosition() - Constants.rearLeftEncoderOffset;
     }
     else if(module == SwerveModule.REAR_RIGHT){
-      return rearRightRotEncoder.getAbsolutePosition();
+      encoderValue = rearRightRotEncoder.getAbsolutePosition() - Constants.rearRightEncoderOffset;
     }
     else{
       return 0;
     }
+
+    //Deals with offset loop bug
+    if(encoderValue < 0){
+      encoderValue = encoderValue + 360;
+    }
+    //Signs values ([-180,180] not [0,360])
+    if(encoderValue > 180){
+      encoderValue = encoderValue - 360;
+    }
+
+    return encoderValue;
   }
   public double getRotPIDOutput(SwerveModule module){
     if(module == SwerveModule.FRONT_LEFT){
-      return frontLeftPID.calculate(frontLeftRotEncoder.getAbsolutePosition());
+      return frontLeftPID.calculate(getRotEncoderValue(SwerveModule.FRONT_LEFT));
     }
     else if(module == SwerveModule.FRONT_RIGHT){
-      return frontRightPID.calculate(frontRightRotEncoder.getAbsolutePosition());
+      return frontRightPID.calculate(getRotEncoderValue(SwerveModule.FRONT_RIGHT));
     }
     else if(module == SwerveModule.REAR_LEFT){
-      return rearLeftPID.calculate(rearLeftRotEncoder.getAbsolutePosition());
+      return rearLeftPID.calculate(getRotEncoderValue(SwerveModule.REAR_LEFT));
     }
     else if(module == SwerveModule.REAR_RIGHT){
-      return rearRightPID.calculate(rearRightRotEncoder.getAbsolutePosition());
+      return rearRightPID.calculate(getRotEncoderValue(SwerveModule.REAR_RIGHT));
     }
     else{
       return 0;
     }
   }
   
+  public double getNavXOutput(){
+    return navx.getYaw();
+  }
 
 
   //------------------------------------------------------------------------------------------------------------------------------------

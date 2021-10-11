@@ -57,8 +57,6 @@ public class SmartDashboardCommand extends CommandBase {
       SmartDashboard.putString(splitSplitStringArrayDWX[0], splitSplitStringArrayDWX[1]);
 
     }
-    
-    SmartDashboard.putString("driveWithXboxDashboard", DriveWithXbox.driveWithXboxDashboard);
 
     //VARS FROM ROBOTCONTAINER AND DRIVETRAIN
 
@@ -76,7 +74,6 @@ public class SmartDashboardCommand extends CommandBase {
       SmartDashboard.putString(splitSplitStringArrayDVT[0], splitSplitStringArrayDVT[1]);
 
     }
-    SmartDashboard.putString("drivetrainDashboard", Drivetrain.drivetrainDashboard);
 
   }  
 
