@@ -65,11 +65,10 @@ public class Drivetrain extends SubsystemBase {
     rearLeftRotEncoder = new CANCoder(Constants.rearLeftRotEncoderPort);
     rearRightRotEncoder = new CANCoder(Constants.rearRightRotEncoderPort);
 
-    //Changes encoders from (0,360) to (-180,180)
-    frontLeftRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
-    frontRightRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
-    rearLeftRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
-    rearRightRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+    frontLeftRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    frontRightRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    rearLeftRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    rearRightRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
     frontLeftRotEncoder.setPosition(0);
     frontRightRotEncoder.setPosition(0);
@@ -77,20 +76,20 @@ public class Drivetrain extends SubsystemBase {
     rearRightRotEncoder.setPosition(0);
 
     //not sure if these are the right values, just grabbed them from Circuitseed_2021
-    frontLeftPID = new PIDController(1.0, 0.00, 0.00);
-    frontRightPID = new PIDController(1.0, 0.00, 0.00);
-    rearLeftPID = new PIDController(1.0, 0.00, 0.00);
-    rearRightPID = new PIDController(1.0, 0.00, 0.00);
+    frontLeftPID = new PIDController(0.02, 0.00, 0.00);
+    frontRightPID = new PIDController(0.02, 0.00, 0.00);
+    rearLeftPID = new PIDController(0.02, 0.00, 0.00);
+    rearRightPID = new PIDController(0.02, 0.00, 0.00);
 
     frontLeftPID.enableContinuousInput(-180, 180);
     frontRightPID.enableContinuousInput(-180, 180);
     rearLeftPID.enableContinuousInput(-180, 180);
     rearRightPID.enableContinuousInput(-180, 180);
 
-    frontLeftPID.setTolerance(2.0);
-    frontRightPID.setTolerance(2.0);
-    rearLeftPID.setTolerance(2.0);
-    rearRightPID.setTolerance(2.0);
+    frontLeftPID.setTolerance(5.0);
+    frontRightPID.setTolerance(5.0);
+    rearLeftPID.setTolerance(5.0);
+    rearRightPID.setTolerance(5.0);
     
     navx = new AHRS(SPI.Port.kMXP);
     navx.reset();
@@ -249,16 +248,16 @@ public class Drivetrain extends SubsystemBase {
       rearRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
     }
     else if(motor == Motors.FRONT_LEFT_DRV){
-      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      frontLeftDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
     }
     else if(motor == Motors.FRONT_RIGHT_DRV){
-      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      frontRightDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
     }
     else if(motor == Motors.REAR_LEFT_DRV){
-      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      rearLeftDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
     }
     else if(motor == Motors.REAR_RIGHT_DRV){
-      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, speed);
+      rearRightDrvMotor.set(TalonFXControlMode.PercentOutput, speed);
     }
   }
 
@@ -329,6 +328,7 @@ public class Drivetrain extends SubsystemBase {
       return 0;
     }
 
+
     //Deals with offset loop bug
     if(encoderValue < 0){
       encoderValue = encoderValue + 360;
@@ -337,6 +337,7 @@ public class Drivetrain extends SubsystemBase {
     if(encoderValue > 180){
       encoderValue = encoderValue - 360;
     }
+    
 
     return encoderValue;
   }
@@ -360,6 +361,9 @@ public class Drivetrain extends SubsystemBase {
   
   public double getNavXOutput(){
     return navx.getYaw();
+  }
+  public void zeroNavXYaw(){
+    navx.zeroYaw();
   }
 
 

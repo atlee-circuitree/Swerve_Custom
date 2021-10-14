@@ -30,14 +30,14 @@ public final class Constants {
     public static final int rearRightRotEncoderPort = 12;
 
     //FIND ACTUAL OFFSET VALUES SOON
-    public static final double frontLeftEncoderOffset = 10;
-    public static final double frontRightEncoderOffset = 20;
-    public static final double rearLeftEncoderOffset = 30;
-    public static final double rearRightEncoderOffset = 40;
+    public static final double frontLeftEncoderOffset = 26.45;
+    public static final double frontRightEncoderOffset = 339.78;
+    public static final double rearLeftEncoderOffset = 15.55;
+    public static final double rearRightEncoderOffset = 153.19;
 
     //FIND ACTUAL VALUES SOON (doesn't matter what units they are in, as long as they are the same ones)
-    public static final double trackwidth = 30;
-    public static final double wheelbase = 20;
+    public static final double trackwidth = 14.5;
+    public static final double wheelbase = 25.5;
 
     public static final int xboxControllerPort = 0;
 

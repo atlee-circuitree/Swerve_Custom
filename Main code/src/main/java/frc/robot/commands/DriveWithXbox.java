@@ -17,9 +17,6 @@ import java.lang.Math;
 public class DriveWithXbox extends CommandBase {
 
   private final Drivetrain drivetrain;
-  private double joystickDegrees = 0;
-  private double finalRotateDegrees = 0;
-  private double speed;
 
   public static String driveWithXboxDashboard;
   
@@ -54,13 +51,6 @@ public class DriveWithXbox extends CommandBase {
     7. Debug the heck out of this command
     */
 
-    //arctan of slope of the line through the orgin and (JoyX, JoyY) gives us degree value (atan2 does that, plus catches all exeptions)
-    joystickDegrees = Math.atan2(-RobotContainer.xbox.getY(Hand.kLeft),RobotContainer.xbox.getX(Hand.kLeft));
-    
-    //joystickDegrees is actually in radians right now, so we convert it to degrees (change later if necessary)
-    joystickDegrees = joystickDegrees*(180/Math.PI);
-
-  
     //Define robot target vector variables (X,Y,Z respectively)  
     double forward = -RobotContainer.xbox.getY(Hand.kLeft);
     double strafe = RobotContainer.xbox.getX(Hand.kLeft);
@@ -78,24 +68,68 @@ public class DriveWithXbox extends CommandBase {
     double C = forward - (rotation * (Constants.trackwidth/2));
     double D = forward + (rotation * (Constants.trackwidth/2));
 
-    //Set speeds for modules
-    drivetrain.rotateMotor(Motors.FRONT_LEFT_ROT, Math.sqrt(Math.pow(B, 2) + Math.pow(D, 2)));
-    drivetrain.rotateMotor(Motors.FRONT_RIGHT_ROT, Math.sqrt(Math.pow(B, 2) + Math.pow(C, 2)));
-    drivetrain.rotateMotor(Motors.REAR_LEFT_ROT, Math.sqrt(Math.pow(A, 2) + Math.pow(D, 2)));
-    drivetrain.rotateMotor(Motors.REAR_RIGHT_ROT, Math.sqrt(Math.pow(A, 2) + Math.pow(C, 2)));
+    //Calculates module speeds
+    double frontLeftSpeed = Math.sqrt(Math.pow(B, 2) + Math.pow(D, 2));
+    double frontRightSpeed = Math.sqrt(Math.pow(B, 2) + Math.pow(C, 2));
+    double rearLeftSpeed = Math.sqrt(Math.pow(A, 2) + Math.pow(D, 2));
+    double rearRightSpeed = Math.sqrt(Math.pow(A, 2) + Math.pow(C, 2));
 
-    //Set angles for modules (change speed mod later if needed)
-    drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D), 0.2);
-    drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C), 0.2);
-    drivetrain.rotateModuleNonLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D), 0.2);
-    drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C), 0.2);
+    
+    double max = frontLeftSpeed;
+    if(max < frontRightSpeed){
+      max = frontRightSpeed;
+    }
+    if(max < rearLeftSpeed){
+      max = rearLeftSpeed;
+    } 
+    if(max < rearRightSpeed){
+      max = rearRightSpeed;
+    }
+    if(max > 1){
+      frontLeftSpeed = frontLeftSpeed / max;
+      frontRightSpeed = frontRightSpeed / max;
+      rearLeftSpeed = rearLeftSpeed / max;
+      rearRightSpeed = rearRightSpeed / max;
+    }
+
+    //Make SURE the robot stops when the joysticks are 0
+    if(RobotContainer.xbox.getX(Hand.kLeft) == 0 && RobotContainer.xbox.getY(Hand.kLeft) == 0 && RobotContainer.xbox.getX(Hand.kRight) == 0){
+      drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, 0);
+      drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, 0);
+      drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, 0);
+      drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, 0);
+
+      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D)*(180/Math.PI), 0);
+      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C)*(180/Math.PI), 0);
+      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D)*(180/Math.PI), 0);
+      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 0);
+    }
+    else{
+      //Set speeds for modules
+      drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, frontLeftSpeed);
+      drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, frontRightSpeed);
+      drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, rearLeftSpeed);
+      drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed);
+
+      //Set angles for modules (change speed mod later if needed)
+      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D)*(180/Math.PI), 0.15);
+      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C)*(180/Math.PI), 0.15);
+      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D)*(180/Math.PI), 0.15);
+      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 0.15);
+    }
 
     //Show important values on shuffleboard
-    driveWithXboxDashboard = "FL Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(B, 2) + Math.pow(D, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(B, D))) + ";";
-    driveWithXboxDashboard = driveWithXboxDashboard + "FR Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(B, 2) + Math.pow(C, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(B, C))) + ";";
-    driveWithXboxDashboard = driveWithXboxDashboard + "RL Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(A, 2) + Math.pow(A, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(A, D))) + ";";
-    driveWithXboxDashboard = driveWithXboxDashboard + "RR Module/" + "Speed: " + String.valueOf(Math.round(Math.sqrt(Math.pow(A, 2) + Math.pow(C, 2)))) + " Angle: " + String.valueOf(Math.round(Math.atan2(A, C))) + ";";
+    driveWithXboxDashboard = "FL Module/" + "Speed: " + String.valueOf(frontLeftSpeed) + " Angle: " + String.valueOf(Math.atan2(B, D)*(180/Math.PI)) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "FR Module/" + "Speed: " + String.valueOf(frontRightSpeed) + " Angle: " + String.valueOf(Math.atan2(B, C)*(180/Math.PI)) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "RL Module/" + "Speed: " + String.valueOf(rearLeftSpeed) + " Angle: " + String.valueOf(Math.atan2(A, D)*(180/Math.PI)) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "RR Module/" + "Speed: " + String.valueOf(rearRightSpeed) + " Angle: " + String.valueOf(Math.atan2(A, C)*(180/Math.PI)) + ";";
+    driveWithXboxDashboard = driveWithXboxDashboard + "NavX Yaw/" + String.valueOf(drivetrain.getNavXOutput()) + ";";
 
+
+    //DEBUG
+    if(RobotContainer.xbox.getStickButton(Hand.kRight)){
+      drivetrain.zeroNavXYaw();
+    }
   }  
 
   @Override

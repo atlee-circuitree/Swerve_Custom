@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Drivetrain.Motors;
+import frc.robot.subsystems.Drivetrain.SwerveModule;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,7 +38,7 @@ public class RecalibrateModules extends CommandBase {
 
     double speed;
 
-    speed = 0.1 * (xbox.getTriggerAxis(Hand.kLeft) - xbox.getTriggerAxis(Hand.kRight));
+    speed = 0.06 * (xbox.getTriggerAxis(Hand.kLeft) - xbox.getTriggerAxis(Hand.kRight));
      
     if(xbox.getAButtonPressed()){
       moduleSelected++;
@@ -61,6 +62,10 @@ public class RecalibrateModules extends CommandBase {
 
     SmartDashboard.putNumber("testSpeed", speed);
     SmartDashboard.putNumber("Module selected", moduleSelected);
+    SmartDashboard.putNumber("FL Encoder", drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
+    SmartDashboard.putNumber("FR Encoder", drivetrain.getRotEncoderValue(SwerveModule.FRONT_RIGHT));
+    SmartDashboard.putNumber("RL Encoder", drivetrain.getRotEncoderValue(SwerveModule.REAR_LEFT));
+    SmartDashboard.putNumber("RR Encoder", drivetrain.getRotEncoderValue(SwerveModule.REAR_RIGHT));
 
   }
 
