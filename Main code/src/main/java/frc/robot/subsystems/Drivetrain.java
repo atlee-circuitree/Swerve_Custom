@@ -303,6 +303,41 @@ public class Drivetrain extends SubsystemBase {
   }
 
 
+
+  public void rotateModuleLinear(SwerveModule module, double targetDegrees, double speed){
+
+    if(module == SwerveModule.FRONT_LEFT){
+      frontLeftPID.setSetpoint(targetDegrees);
+      while(!frontLeftPID.atSetpoint()){
+        frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_LEFT), -speed, speed));
+      }
+      frontLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+    else if(module == SwerveModule.FRONT_RIGHT){
+      frontRightPID.setSetpoint(targetDegrees);
+      while(!frontRightPID.atSetpoint()){
+        frontRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.FRONT_RIGHT), -speed, speed));
+      }
+      frontRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+    else if(module == SwerveModule.REAR_LEFT){
+      rearLeftPID.setSetpoint(targetDegrees);
+      while(!rearLeftPID.atSetpoint()){
+        rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_LEFT), -speed, speed));
+      }
+      rearLeftRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+    else if(module == SwerveModule.REAR_RIGHT){
+      rearRightPID.setSetpoint(targetDegrees);
+      while(!rearRightPID.atSetpoint()){
+        rearRightRotMotor.set(TalonFXControlMode.PercentOutput, MathUtil.clamp(getRotPIDOutput(SwerveModule.REAR_RIGHT), -speed, speed));
+      }
+      rearRightRotMotor.set(TalonFXControlMode.PercentOutput, 0);
+    }
+
+  }
+
+
   //------------------------------------------------------------------------------------------------------------------------------------
   //SENSORS
   //------------------------------------------------------------------------------------------------------------------------------------
@@ -379,6 +414,11 @@ public class Drivetrain extends SubsystemBase {
       return MathUtil.clamp(value, -highest, -lowest);
   }
 }
+
+public double customPID(double target){
+  return Math.pow((target - getNavXOutput())/180, 2);
+}
+
 
   public String sendDashboard(){
     

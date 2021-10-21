@@ -93,7 +93,7 @@ public class DriveWithXbox extends CommandBase {
     }
 
     //Make SURE the robot stops when the joysticks are 0
-    if(RobotContainer.xbox.getX(Hand.kLeft) == 0 && RobotContainer.xbox.getY(Hand.kLeft) == 0 && RobotContainer.xbox.getX(Hand.kRight) == 0){
+    if((RobotContainer.xbox.getX(Hand.kLeft) == 0 && RobotContainer.xbox.getY(Hand.kLeft) == 0 && RobotContainer.xbox.getX(Hand.kRight) == 0) || !RobotContainer.xbox.getAButton()){
       drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, 0);
       drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, 0);
       drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, 0);
@@ -105,17 +105,17 @@ public class DriveWithXbox extends CommandBase {
       drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 0);
     }
     else{
+      //Set angles for modules (change speed mod later if needed)
+      drivetrain.rotateModuleLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D)*(180/Math.PI), 0.1);
+      drivetrain.rotateModuleLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C)*(180/Math.PI), 0.1);
+      drivetrain.rotateModuleLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D)*(180/Math.PI), 0.1);
+      drivetrain.rotateModuleLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 0.1);
+
       //Set speeds for modules
       drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, frontLeftSpeed);
       drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, frontRightSpeed);
       drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, rearLeftSpeed);
       drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed);
-
-      //Set angles for modules (change speed mod later if needed)
-      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D)*(180/Math.PI), 0.15);
-      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C)*(180/Math.PI), 0.15);
-      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D)*(180/Math.PI), 0.15);
-      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 0.15);
     }
 
     //Show important values on shuffleboard
