@@ -6,9 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveWithXbox;
 import frc.robot.commands.RecalibrateModules;
 import frc.robot.commands.SmartDashboardCommand;
@@ -40,9 +37,6 @@ public class RobotContainer {
   private final PerpetualCommand DWXwithSDC;
   private final RecalibrateModules recalibrateModules;
   
-
-  private boolean runOnce = false;
-  private int teleopSelector = 1;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

@@ -37,18 +37,19 @@ public class DriveWithXbox extends CommandBase {
     Holy cow this is going to be A LOT of code eventually...
     (Actually, it's pretty compact/efficient currently. I thought this was going to need a lot more code... - Simon 8/3/21)
     (You were a fool, past Simon. This is going to be a lot of code, and even more math - Simon 10/11/21)
+    (This is getting out of hand *Screams in PID* - Simon 11/12/21)
 
     IF YOU DO WANT TO EDIT THIS COMMAND, BE SURE TO READ THE SWERVE PDFs
     (can be found on chief delphi, search for "4 wheel independent drive independent steering swerve", should be 1st 2 PDFs)
 
     Steps of what we need to do:
-    1. Convert joystick X/Y values to degrees   
-    2. Modify that value by NavX position to do field orientation **Skipped this step for now**
+    1. Convert joystick X/Y values to degrees **Added compicated yet necessary math**   
+    2. Modify that value by NavX position to do field orientation
     3. Feed final value to a rotateModules() function
     4. Get speed value from joystick
     5. Feed that to a driveMotors() function 
-    6. Add in a rotateEntireRobot() function using the other joystick and hope it doesnt break anything **Currently on this step - Simon**
-    7. Debug the heck out of this command
+    6. Add in a rotateEntireRobot() function using the other joystick and hope it doesnt break anything 
+    7. Debug the heck out of this command **Currently on this step - Simon**
     */
 
     //Define robot target vector variables (X,Y,Z respectively)  
@@ -61,12 +62,12 @@ public class DriveWithXbox extends CommandBase {
     strafe = -forward * Math.sin(drivetrain.getNavXOutput()) + strafe * Math.cos(drivetrain.getNavXOutput()); 
     forward = temp;
 
-    //Do some math to actually define the target vectors
-    //I don't have enough space to say what A,B,C and D represent, but the swerve documentation does it well 
-    double A = strafe - (rotation * (Constants.wheelbase/2));
-    double B = strafe + (rotation * (Constants.wheelbase/2));
-    double C = forward - (rotation * (Constants.trackwidth/2));
-    double D = forward + (rotation * (Constants.trackwidth/2));
+    //Do some math to calculate the angles/sppeds needed to meet the target vectors
+    //I don't have enough space to say what A,B,C and D actually represent, but the swerve documentation does it well 
+    double A = strafe - (rotation * (Constants.wheelbase/Constants.drivetrainRadius));
+    double B = strafe + (rotation * (Constants.wheelbase/Constants.drivetrainRadius));
+    double C = forward - (rotation * (Constants.trackwidth/Constants.drivetrainRadius));
+    double D = forward + (rotation * (Constants.trackwidth/Constants.drivetrainRadius));
 
     //Calculates module speeds
     double frontLeftSpeed = Math.sqrt(Math.pow(B, 2) + Math.pow(D, 2));
@@ -74,7 +75,7 @@ public class DriveWithXbox extends CommandBase {
     double rearLeftSpeed = Math.sqrt(Math.pow(A, 2) + Math.pow(D, 2));
     double rearRightSpeed = Math.sqrt(Math.pow(A, 2) + Math.pow(C, 2));
 
-    
+    //Normalizes speeds (makes sure that none are > 1)
     double max = frontLeftSpeed;
     if(max < frontRightSpeed){
       max = frontRightSpeed;
@@ -93,7 +94,7 @@ public class DriveWithXbox extends CommandBase {
     }
 
     //Make SURE the robot stops when the joysticks are 0
-    if((RobotContainer.xbox.getX(Hand.kLeft) == 0 && RobotContainer.xbox.getY(Hand.kLeft) == 0 && RobotContainer.xbox.getX(Hand.kRight) == 0) || !RobotContainer.xbox.getAButton()){
+    if((RobotContainer.xbox.getX(Hand.kLeft) == 0 && RobotContainer.xbox.getY(Hand.kLeft) == 0 && RobotContainer.xbox.getX(Hand.kRight) == 0)){
       drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, 0);
       drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, 0);
       drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, 0);
@@ -106,10 +107,10 @@ public class DriveWithXbox extends CommandBase {
     }
     else{
       //Set angles for modules (change speed mod later if needed)
-      drivetrain.rotateModuleLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D)*(180/Math.PI), 0.1);
-      drivetrain.rotateModuleLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C)*(180/Math.PI), 0.1);
-      drivetrain.rotateModuleLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D)*(180/Math.PI), 0.1);
-      drivetrain.rotateModuleLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 0.1);
+      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_LEFT, Math.atan2(B, D)*(180/Math.PI), 1);
+      drivetrain.rotateModuleNonLinear(SwerveModule.FRONT_RIGHT, Math.atan2(B, C)*(180/Math.PI), 1);
+      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_LEFT, Math.atan2(A, D)*(180/Math.PI), 1);
+      drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 1);
 
       //Set speeds for modules
       drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, frontLeftSpeed);
@@ -118,7 +119,7 @@ public class DriveWithXbox extends CommandBase {
       drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed);
     }
 
-    //Show important values on shuffleboard
+    //Show important values on dashboard
     driveWithXboxDashboard = "FL Module/" + "Speed: " + String.valueOf(frontLeftSpeed) + " Angle: " + String.valueOf(Math.atan2(B, D)*(180/Math.PI)) + ";";
     driveWithXboxDashboard = driveWithXboxDashboard + "FR Module/" + "Speed: " + String.valueOf(frontRightSpeed) + " Angle: " + String.valueOf(Math.atan2(B, C)*(180/Math.PI)) + ";";
     driveWithXboxDashboard = driveWithXboxDashboard + "RL Module/" + "Speed: " + String.valueOf(rearLeftSpeed) + " Angle: " + String.valueOf(Math.atan2(A, D)*(180/Math.PI)) + ";";

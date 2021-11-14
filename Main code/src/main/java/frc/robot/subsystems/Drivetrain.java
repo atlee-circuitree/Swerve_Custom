@@ -55,6 +55,11 @@ public class Drivetrain extends SubsystemBase {
     rearLeftRotMotor = new TalonFX(Constants.rearLeftRotMotorPort);
     rearRightRotMotor = new TalonFX(Constants.rearRightRotMotorPort);
 
+    frontLeftDrvMotor.setNeutralMode(NeutralMode.Brake);
+    frontRightDrvMotor.setNeutralMode(NeutralMode.Brake);
+    rearLeftDrvMotor.setNeutralMode(NeutralMode.Brake);
+    rearRightDrvMotor.setNeutralMode(NeutralMode.Brake);
+
     frontLeftRotMotor.setNeutralMode(NeutralMode.Brake);
     frontRightRotMotor.setNeutralMode(NeutralMode.Brake);
     rearLeftRotMotor.setNeutralMode(NeutralMode.Brake);
@@ -70,26 +75,27 @@ public class Drivetrain extends SubsystemBase {
     rearLeftRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     rearRightRotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
+    //We are using getAboslutePosition(), but just in case
     frontLeftRotEncoder.setPosition(0);
     frontRightRotEncoder.setPosition(0);
     rearLeftRotEncoder.setPosition(0);
     rearRightRotEncoder.setPosition(0);
 
-    //not sure if these are the right values, just grabbed them from Circuitseed_2021
-    frontLeftPID = new PIDController(0.02, 0.00, 0.00);
-    frontRightPID = new PIDController(0.02, 0.00, 0.00);
-    rearLeftPID = new PIDController(0.02, 0.00, 0.00);
-    rearRightPID = new PIDController(0.02, 0.00, 0.00);
+    //not sure if these are the perfect values, but they work good enough, so.....
+    frontLeftPID = new PIDController(0.01, 0.00, 0.00);
+    frontRightPID = new PIDController(0.01, 0.00, 0.00);
+    rearLeftPID = new PIDController(0.01, 0.00, 0.00);
+    rearRightPID = new PIDController(0.01, 0.00, 0.00);
 
     frontLeftPID.enableContinuousInput(-180, 180);
     frontRightPID.enableContinuousInput(-180, 180);
     rearLeftPID.enableContinuousInput(-180, 180);
     rearRightPID.enableContinuousInput(-180, 180);
 
-    frontLeftPID.setTolerance(5.0);
-    frontRightPID.setTolerance(5.0);
-    rearLeftPID.setTolerance(5.0);
-    rearRightPID.setTolerance(5.0);
+    frontLeftPID.setTolerance(2.0);
+    frontRightPID.setTolerance(2.0);
+    rearLeftPID.setTolerance(2.0);
+    rearRightPID.setTolerance(2.0);
     
     navx = new AHRS(SPI.Port.kMXP);
     navx.reset();
