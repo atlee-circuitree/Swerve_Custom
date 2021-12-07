@@ -54,12 +54,12 @@ public class DriveWithXbox extends CommandBase {
 
     //Define robot target vector variables (X,Y,Z respectively)  
     double forward = -RobotContainer.xbox.getY(Hand.kLeft);
-    double strafe = RobotContainer.xbox.getX(Hand.kLeft);
-    double rotation = RobotContainer.xbox.getX(Hand.kRight);
+    double strafe = -RobotContainer.xbox.getX(Hand.kLeft);
+    double rotation = -RobotContainer.xbox.getX(Hand.kRight);
 
     //Modify target values for field orientation (temp used to save calculations before original forward and strafe values are modified)
-    double temp = forward * Math.cos(drivetrain.getNavXOutput()) + strafe * Math.sin(drivetrain.getNavXOutput()); 
-    strafe = -forward * Math.sin(drivetrain.getNavXOutput()) + strafe * Math.cos(drivetrain.getNavXOutput()); 
+    double temp = forward * Math.cos(-drivetrain.getNavXOutputRadians()) + strafe * Math.sin(-drivetrain.getNavXOutputRadians()); 
+    strafe = -forward * Math.sin(-drivetrain.getNavXOutputRadians()) + strafe * Math.cos(-drivetrain.getNavXOutputRadians()); 
     forward = temp;
 
     //Do some math to calculate the angles/sppeds needed to meet the target vectors
@@ -113,10 +113,10 @@ public class DriveWithXbox extends CommandBase {
       drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 1);
 
       //Set speeds for modules
-      drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, frontLeftSpeed);
-      drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, frontRightSpeed);
-      drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, rearLeftSpeed);
-      drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed);
+      drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, frontLeftSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
+      drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, frontRightSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
+      drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, rearLeftSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
+      drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
     }
 
     //Show important values on dashboard

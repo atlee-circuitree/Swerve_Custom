@@ -82,20 +82,20 @@ public class Drivetrain extends SubsystemBase {
     rearRightRotEncoder.setPosition(0);
 
     //not sure if these are the perfect values, but they work good enough, so.....
-    frontLeftPID = new PIDController(0.01, 0.00, 0.00);
-    frontRightPID = new PIDController(0.01, 0.00, 0.00);
-    rearLeftPID = new PIDController(0.01, 0.00, 0.00);
-    rearRightPID = new PIDController(0.01, 0.00, 0.00);
+    frontLeftPID = new PIDController(0.0075, 0.00, 0.00);
+    frontRightPID = new PIDController(0.0075, 0.00, 0.00);
+    rearLeftPID = new PIDController(0.0075, 0.00, 0.00);
+    rearRightPID = new PIDController(0.0075, 0.00, 0.00);
 
     frontLeftPID.enableContinuousInput(-180, 180);
     frontRightPID.enableContinuousInput(-180, 180);
     rearLeftPID.enableContinuousInput(-180, 180);
     rearRightPID.enableContinuousInput(-180, 180);
 
-    frontLeftPID.setTolerance(2.0);
-    frontRightPID.setTolerance(2.0);
-    rearLeftPID.setTolerance(2.0);
-    rearRightPID.setTolerance(2.0);
+    frontLeftPID.setTolerance(1.0);
+    frontRightPID.setTolerance(1.0);
+    rearLeftPID.setTolerance(1.0);
+    rearRightPID.setTolerance(1.0);
     
     navx = new AHRS(SPI.Port.kMXP);
     navx.reset();
@@ -402,6 +402,9 @@ public class Drivetrain extends SubsystemBase {
   
   public double getNavXOutput(){
     return navx.getYaw();
+  }
+  public double getNavXOutputRadians(){
+    return Math.toRadians(navx.getYaw());
   }
   public void zeroNavXYaw(){
     navx.zeroYaw();
