@@ -113,10 +113,10 @@ public class DriveWithXbox extends CommandBase {
       drivetrain.rotateModuleNonLinear(SwerveModule.REAR_RIGHT, Math.atan2(A, C)*(180/Math.PI), 1);
 
       //Set speeds for modules
-      drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, frontLeftSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
-      drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, frontRightSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
-      drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, rearLeftSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
-      drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed*0.25*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
+      drivetrain.rotateMotor(Motors.FRONT_LEFT_DRV, frontLeftSpeed*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
+      drivetrain.rotateMotor(Motors.FRONT_RIGHT_DRV, frontRightSpeed*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
+      drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, rearLeftSpeed*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
+      drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed*RobotContainer.xbox.getTriggerAxis(Hand.kLeft));
     }
 
     //Show important values on dashboard

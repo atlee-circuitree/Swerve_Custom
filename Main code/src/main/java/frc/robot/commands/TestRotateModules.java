@@ -10,6 +10,7 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Drivetrain.Motors;
 import frc.robot.subsystems.Drivetrain.SwerveModule;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
@@ -102,6 +103,11 @@ public class TestRotateModules extends CommandBase {
       drivetrain.rotateMotor(Motors.REAR_LEFT_DRV, rearLeftSpeed*0);
       drivetrain.rotateMotor(Motors.REAR_RIGHT_DRV, rearRightSpeed*0);
     }
+
+    SmartDashboard.putNumber("DEBUG FL ENCODER", drivetrain.getRotEncoderValue(SwerveModule.FRONT_LEFT));
+    SmartDashboard.putNumber("DEBUG FR ENCODER", drivetrain.getRotEncoderValue(SwerveModule.FRONT_RIGHT));
+    SmartDashboard.putNumber("DEBUG RL ENCODER", drivetrain.getRotEncoderValue(SwerveModule.REAR_LEFT));
+    SmartDashboard.putNumber("DEBUG RR ENCODER", drivetrain.getRotEncoderValue(SwerveModule.REAR_RIGHT));
 
   }
 
