@@ -8,7 +8,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
+
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -42,6 +48,8 @@ public class Drivetrain extends SubsystemBase {
 
   AHRS navx;
 
+  SwerveDriveOdometry odometry;
+
   public static String drivetrainDashboard;
 
   public Drivetrain() {
@@ -49,6 +57,13 @@ public class Drivetrain extends SubsystemBase {
     frontRightDrvMotor = new TalonFX(Constants.frontRightDrvMotorPort);
     rearLeftDrvMotor = new TalonFX(Constants.rearLeftDrvMotorPort);
     rearRightDrvMotor = new TalonFX(Constants.rearRightDrvMotorPort);
+
+    //This *should* be selecting the inbuilt talon encoder as the output device
+    //Dunno what 1 and 50 are suppposed to be
+    frontLeftDrvMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 1, 50);
+    frontRightDrvMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 1, 50);
+    rearLeftDrvMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 1, 50);
+    rearRightDrvMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 1, 50);
 
     frontLeftRotMotor = new TalonFX(Constants.frontLeftRotMotorPort);
     frontRightRotMotor = new TalonFX(Constants.frontRightRotMotorPort);
@@ -100,6 +115,8 @@ public class Drivetrain extends SubsystemBase {
     navx = new AHRS(SPI.Port.kMXP);
     navx.reset();
 
+    odometry = new SwerveDriveOdometry(Constants.driveKinematics, navx.getRotation2d());
+
   }
 
   @Override
@@ -117,6 +134,13 @@ public class Drivetrain extends SubsystemBase {
 
     drivetrainDashboard = drivetrainDashboard + "rearRight rot encoder/" + getRotEncoderValue(SwerveModule.REAR_RIGHT) + ";";
     drivetrainDashboard = drivetrainDashboard + "rearRight PID/" + getRotPIDOutput(SwerveModule.REAR_RIGHT); 
+
+    //Updates odometry
+    odometry.update(navx.getRotation2d(), 
+    new SwerveModuleState(frontLeftDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.FRONT_LEFT))),
+    new SwerveModuleState(frontRightDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.FRONT_RIGHT))),
+    new SwerveModuleState(rearLeftDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.REAR_LEFT))),
+    new SwerveModuleState(rearRightDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.REAR_RIGHT))));
 
   }
 
@@ -447,6 +471,27 @@ public double customPID(double target){
 
     return drivetrainDashboard;
   }
+
+
+
+
+
+
+
+//AUTO STUFF
+
+public Pose2d getPose() {
+  return odometry.getPoseMeters();
+}
+
+public void resetOdometry(Pose2d pose) {
+  odometry.resetPosition(pose, navx.getRotation2d());
+}
+
+
+
+
+
 
 
 }
