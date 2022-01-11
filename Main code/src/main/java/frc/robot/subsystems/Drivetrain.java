@@ -123,6 +123,13 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
+    //Updates odometry
+    odometry.update(navx.getRotation2d(), 
+    new SwerveModuleState(frontLeftDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.FRONT_LEFT))),
+    new SwerveModuleState(frontRightDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.FRONT_RIGHT))),
+    new SwerveModuleState(rearLeftDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.REAR_LEFT))),
+    new SwerveModuleState(rearRightDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.REAR_RIGHT))));
+
     drivetrainDashboard = "frontLeft rot encoder/" + getRotEncoderValue(SwerveModule.FRONT_LEFT) + ";";
     drivetrainDashboard = drivetrainDashboard + "frontLeft PID/" + getRotPIDOutput(SwerveModule.FRONT_LEFT) + ";";
 
@@ -133,14 +140,11 @@ public class Drivetrain extends SubsystemBase {
     drivetrainDashboard = drivetrainDashboard + "rearLeft PID/" + getRotPIDOutput(SwerveModule.REAR_LEFT) + ";";
 
     drivetrainDashboard = drivetrainDashboard + "rearRight rot encoder/" + getRotEncoderValue(SwerveModule.REAR_RIGHT) + ";";
-    drivetrainDashboard = drivetrainDashboard + "rearRight PID/" + getRotPIDOutput(SwerveModule.REAR_RIGHT); 
+    drivetrainDashboard = drivetrainDashboard + "rearRight PID/" + getRotPIDOutput(SwerveModule.REAR_RIGHT) + ";"; 
 
-    //Updates odometry
-    odometry.update(navx.getRotation2d(), 
-    new SwerveModuleState(frontLeftDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.FRONT_LEFT))),
-    new SwerveModuleState(frontRightDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.FRONT_RIGHT))),
-    new SwerveModuleState(rearLeftDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.REAR_LEFT))),
-    new SwerveModuleState(rearRightDrvMotor.getSelectedSensorVelocity(), Rotation2d.fromDegrees(getRotEncoderValue(SwerveModule.REAR_RIGHT))));
+    drivetrainDashboard = drivetrainDashboard + "odometry X/" + odometry.getPoseMeters().getX() + ";";
+    drivetrainDashboard = drivetrainDashboard + "odometry Y/" + odometry.getPoseMeters().getY() + ";";
+    drivetrainDashboard = drivetrainDashboard + "odometry Z/" + odometry.getPoseMeters().getRotation().getDegrees();
 
   }
 
@@ -486,6 +490,13 @@ public Pose2d getPose() {
 
 public void resetOdometry(Pose2d pose) {
   odometry.resetPosition(pose, navx.getRotation2d());
+}
+
+public void setSwerveModuleStates(SwerveModuleState[] targetState){
+  rotateModuleNonLinear(SwerveModule.FRONT_LEFT, targetState[0].angle.getDegrees(), targetState[0].speedMetersPerSecond);
+  rotateModuleNonLinear(SwerveModule.FRONT_RIGHT, targetState[1].angle.getDegrees(), targetState[1].speedMetersPerSecond);
+  rotateModuleNonLinear(SwerveModule.REAR_LEFT, targetState[2].angle.getDegrees(), targetState[2].speedMetersPerSecond);
+  rotateModuleNonLinear(SwerveModule.REAR_RIGHT, targetState[3].angle.getDegrees(), targetState[3].speedMetersPerSecond);
 }
 
 

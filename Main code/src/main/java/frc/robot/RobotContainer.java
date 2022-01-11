@@ -129,13 +129,13 @@ public class RobotContainer {
             new PIDController(1.0, 0, 0),
             new PIDController(1.0, 0, 0),
             thetaController,
-            m_robotDrive::setModuleStates,
+            drivetrain::setSwerveModuleStates,
             drivetrain);
 
     // Reset odometry to the starting pose of the trajectory.
     drivetrain.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+    return swerveControllerCommand.andThen(() -> drivetrain.driveAllModulesNonLinear(0));
   }
 }
